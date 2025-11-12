@@ -1,0 +1,120 @@
+
+{
+  "users": [
+    {
+      "id": "user1",
+      "email": "user@example.com",
+      "name": "user",
+      "password": "password123"
+    }
+  ],
+  "bills": [
+    {
+      "id": "bill1",
+      "name": "Personal",
+      "description": "My personal daily expenses.",
+      "userId": "user1"
+    },
+    {
+      "id": "bill2",
+      "name": "Family",
+      "description": "Shared family expenses.",
+      "userId": "user1"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat1",
+      "name": "seedCategories.salary",
+      "isSeed": true,
+      "type": "income",
+      "icon": "dollar-sign",
+      "color": "#10B981",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat2",
+      "name": "seedCategories.groceries",
+      "isSeed": true,
+      "type": "expense",
+      "icon": "shopping-cart",
+      "color": "#EF4444",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat3",
+      "name": "seedCategories.rent",
+      "isSeed": true,
+      "type": "expense",
+      "icon": "home",
+      "color": "#3B82F6",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat4",
+      "name": "seedCategories.transport",
+      "isSeed": true,
+      "type": "expense",
+      "icon": "truck",
+      "color": "#F97316",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat5",
+      "name": "seedCategories.entertainment",
+      "isSeed": true,
+      "type": "expense",
+      "icon": "film",
+      "color": "#8B5CF6",
+      "userId": "user1",
+      "billId": "bill1"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx1",
+      "billId": "bill1",
+      "categoryId": "cat1",
+      "type": "income",
+      "amount": 3000,
+      "date": "2023-10-01",
+      "notes": "Monthly Salary",
+      "userId": "user1"
+    },
+    {
+      "id": "tx2",
+      "billId": "bill1",
+      "categoryId": "cat2",
+      "type": "expense",
+      "amount": 150.75,
+      "date": "2023-10-05",
+      "notes": "Weekly groceries",
+      "userId": "user1"
+    },
+    {
+      "id": "tx3",
+      "billId": "bill1",
+      "categoryId": "cat3",
+      "type": "expense",
+      "amount": 1200,
+      "date": "2023-10-01",
+      "notes": "October Rent",
+      "userId": "user1"
+    },
+    {
+      "id": "tx4",
+      "billId": "bill2",
+      "categoryId": "cat4",
+      "type": "expense",
+      "amount": 50,
+      "date": "2023-10-03",
+      "notes": "Gas for car",
+      "userId": "user1"
+    }
+  ],
+  "billShares": []
+}

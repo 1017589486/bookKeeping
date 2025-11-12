@@ -1,0 +1,33 @@
+{
+  "name": "fintrack-pro",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.4.1",
+    "react-router-dom": "^7.9.5",
+    "i18next": "^23.11.5",
+    "react-i18next": "^14.1.2",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "cors": "^2.8.5",
+    "url": "^0.11.4",
+    "path": "^0.12.7",
+    "fs": "^0.0.1-security",
+    "crypto": "^1.0.1",
+    "express": "^5.1.0",
+    "react-i": "^0.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
