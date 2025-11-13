@@ -102,7 +102,10 @@ export default {
     "save_asset": "保存资产",
     "no_assets": "未找到资产。请添加一个开始使用。",
     "delete_confirm": "您确定要删除此资产吗？",
-    "total_assets": "总资产"
+    "total_assets": "总资产",
+    "asset_trend_analysis": "资产趋势分析",
+    "monthly": "月度",
+    "daily": "每日"
   },
   "import_export": {
     "export_data": "导出数据",

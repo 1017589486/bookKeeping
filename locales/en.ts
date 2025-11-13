@@ -102,7 +102,10 @@ export default {
     "save_asset": "Save Asset",
     "no_assets": "No assets found. Add one to get started.",
     "delete_confirm": "Are you sure you want to delete this asset?",
-    "total_assets": "Total Assets"
+    "total_assets": "Total Assets",
+    "asset_trend_analysis": "Asset Trend Analysis",
+    "monthly": "Monthly",
+    "daily": "Daily"
   },
   "import_export": {
     "export_data": "Export Data",
