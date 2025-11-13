@@ -29,7 +29,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset, onEdit, onDelete, formatCu
             </div>
             <div className="bg-gray-50 dark:bg-gray-900/50 p-3 flex justify-end space-x-2 rounded-b-lg border-t border-gray-200 dark:border-gray-700">
                 <button onClick={onEdit} className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors px-3 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">{t('common.edit')}</button>
-                <button onClick={onDelete} className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-danger dark:hover:text-danger transition-colors px-3 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">{t('common.delete')}</button>
+                <button onClick={onDelete} className="text-sm font-medium text-danger hover:text-red-600 dark:hover:text-red-400 transition-colors px-3 py-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20">{t('common.delete')}</button>
             </div>
         </div>
     );
