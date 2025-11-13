@@ -11,7 +11,7 @@ import BillCard from '../components/BillCard';
 import TransactionModal from '../components/TransactionModal';
 
 const BillsPage: React.FC = () => {
-  const { bills, addBill, updateBill, deleteBill, transactions, setActiveBillId, addTransaction, updateTransaction, categories } = useAppContext();
+  const { bills, addBill, updateBill, deleteBill, transactions, setActiveBillId, addTransaction, updateTransaction, categories, assets } = useAppContext();
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const [currentBill, setCurrentBill] = useState<Bill | null>(null);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
@@ -144,6 +144,7 @@ const BillsPage: React.FC = () => {
         transaction={editingTx}
         categories={categories}
         billId={txModalBillId}
+        assets={assets}
       />
     </div>
   );

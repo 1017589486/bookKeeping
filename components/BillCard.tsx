@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bill } from '../types';
 import Button from './Button';
+import { formatCurrency } from '../utils/helpers';
 
 interface BillCardProps {
   bill: Bill;
@@ -21,7 +22,7 @@ interface BillCardProps {
 }
 
 const BillCard: React.FC<BillCardProps> = ({ bill, stats, borderColor, onViewDetails, onAddTransaction, onEdit, onDelete, canEdit }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -34,10 +35,6 @@ const BillCard: React.FC<BillCardProps> = ({ bill, stats, borderColor, onViewDet
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY' }).format(value);
-  }
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 border-l-4 ${borderColor}`}>
@@ -65,11 +62,11 @@ const BillCard: React.FC<BillCardProps> = ({ bill, stats, borderColor, onViewDet
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.total_income')}</p>
-            <p className="text-lg font-semibold text-green-500">{formatCurrency(stats.income)}</p>
+            <p className="text-lg font-semibold text-green-500">{formatCurrency(stats.income, i18n.language)}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.total_expense')}</p>
-            <p className="text-lg font-semibold text-red-500">{formatCurrency(stats.expense)}</p>
+            <p className="text-lg font-semibold text-red-500">{formatCurrency(stats.expense, i18n.language)}</p>
           </div>
         </div>
       </div>
@@ -80,7 +77,7 @@ const BillCard: React.FC<BillCardProps> = ({ bill, stats, borderColor, onViewDet
          <div className="flex justify-between items-center">
            <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.balance')}</p>
            <p className={`text-xl font-bold ${stats.balance >= 0 ? 'text-gray-900 dark:text-gray-100' : 'text-red-500'}`}>
-             {formatCurrency(stats.balance)}
+             {formatCurrency(stats.balance, i18n.language)}
            </p>
          </div>
       </div>

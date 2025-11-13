@@ -7,10 +7,11 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import Input from '../components/Input';
 import AssetCard from '../components/AssetCard';
+import { formatCurrency } from '../utils/helpers';
 
 const AssetsPage: React.FC = () => {
     const { assets, addAsset, updateAsset, deleteAsset } = useAppContext();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
 
@@ -43,10 +44,6 @@ const AssetsPage: React.FC = () => {
         return assets.reduce((total, asset) => total + asset.balance, 0);
     }, [assets]);
     
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
-    }
-
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -59,7 +56,7 @@ const AssetsPage: React.FC = () => {
             {/* Total Assets Card */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
                 <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('assets.total_assets')}</h4>
-                <p className="text-3xl font-bold mt-2 text-primary">{formatCurrency(totalAssetsValue)}</p>
+                <p className="text-3xl font-bold mt-2 text-primary">{formatCurrency(totalAssetsValue, i18n.language)}</p>
             </div>
 
             {assets.length > 0 ? (
@@ -70,7 +67,7 @@ const AssetsPage: React.FC = () => {
                             asset={asset}
                             onEdit={() => openModal(asset)}
                             onDelete={() => handleDelete(asset.id)}
-                            formatCurrency={formatCurrency}
+                            formatCurrency={(value) => formatCurrency(value, i18n.language)}
                         />
                     ))}
                 </div>

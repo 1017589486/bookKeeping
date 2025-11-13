@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Transaction, TransactionType, Category } from '../types';
-import { getCurrentDateString } from '../utils/helpers';
+import { Transaction, TransactionType, Category, Asset } from '../types';
+import { getCurrentDateString, formatCurrency } from '../utils/helpers';
 import Button from './Button';
 import Modal from './Modal';
 import Input from './Input';
@@ -17,15 +17,17 @@ interface TransactionModalProps {
     transaction: Transaction | null;
     categories: Category[];
     billId: string | null;
+    assets: Asset[];
 }
 
-const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, onSave, transaction, categories, billId }) => {
-    const { t } = useTranslation();
+const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, onSave, transaction, categories, billId, assets }) => {
+    const { t, i18n } = useTranslation();
     const [type, setType] = useState<TransactionType>(TransactionType.EXPENSE);
     const [amount, setAmount] = useState('');
     const [categoryId, setCategoryId] = useState('');
     const [date, setDate] = useState(getCurrentDateString());
     const [notes, setNotes] = useState('');
+    const [assetId, setAssetId] = useState<string | undefined>(undefined);
 
     React.useEffect(() => {
         if (!isOpen) return;
@@ -35,6 +37,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
             setCategoryId(transaction.categoryId);
             setDate(transaction.date);
             setNotes(transaction.notes);
+            setAssetId(transaction.assetId);
         } else {
             setType(TransactionType.EXPENSE);
             setAmount('');
@@ -42,6 +45,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
             setCategoryId(firstCategory?.id || '');
             setDate(getCurrentDateString());
             setNotes('');
+            setAssetId(undefined);
         }
     }, [transaction, isOpen, categories, billId]);
 
@@ -57,7 +61,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
             console.error("No billId provided to TransactionModal");
             return;
         }
-        onSave({ billId, type, amount: parseFloat(amount), categoryId, date, notes }, !transaction);
+        onSave({ billId, type, amount: parseFloat(amount), categoryId, date, notes, assetId: assetId || undefined }, !transaction);
     };
     
     const getCategoryName = (category: Category) => {
@@ -80,6 +84,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                 <Select label={t('transactions.category')} value={categoryId} onChange={e => setCategoryId(e.target.value)} required>
                     <option value="" disabled>{t('transactions.select_category')}</option>
                     {availableCategories.map(c => <option key={c.id} value={c.id}>{getCategoryName(c)}</option>)}
+                </Select>
+                <Select
+                  label={t('transactions.asset_account')}
+                  value={assetId || ''}
+                  onChange={e => setAssetId(e.target.value || undefined)}
+                >
+                    <option value="">{t('transactions.none')}</option>
+                    {assets.map(asset => (
+                        <option key={asset.id} value={asset.id}>
+                            {asset.name} ({formatCurrency(asset.balance, i18n.language)})
+                        </option>
+                    ))}
                 </Select>
                 <DateInput label={t('transactions.date')} value={date} onChange={e => setDate(e.target.value)} required />
                 <Input label={t('transactions.notes')} value={notes} onChange={e => setNotes(e.target.value)} />

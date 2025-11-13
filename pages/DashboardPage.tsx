@@ -1,10 +1,11 @@
+
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
 import { TransactionType } from '../types';
 import ExpensePieChart from '../components/charts/ExpensePieChart';
 import IncomeExpenseBarChart from '../components/charts/IncomeExpenseBarChart';
-import { formatDate } from '../utils/helpers';
+import { formatDate, formatCurrency } from '../utils/helpers';
 import CategoryIcon from '../components/CategoryIcon';
 
 const DashboardPage: React.FC = () => {
@@ -105,7 +106,7 @@ const DashboardPage: React.FC = () => {
                                   <td className="px-6 py-4">{formatDate(transaction.date, i18n.language)}</td>
                                   <td className="px-6 py-4 truncate max-w-xs">{transaction.notes}</td>
                                   <td className={`px-6 py-4 text-right font-semibold ${transaction.type === TransactionType.INCOME ? 'text-secondary' : 'text-danger'}`}>
-                                    {transaction.type === TransactionType.INCOME ? '+' : '-'}${transaction.amount.toFixed(2)}
+                                    {transaction.type === TransactionType.INCOME ? '+' : ''}{formatCurrency(transaction.amount, i18n.language)}
                                   </td>
                               </tr>
                           );
@@ -129,6 +130,7 @@ interface StatCardProps {
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, type }) => {
+    const { i18n } = useTranslation();
     const colors = {
         income: 'text-secondary',
         expense: 'text-danger',
@@ -137,7 +139,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, type }) => {
     return (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
             <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</h4>
-            <p className={`text-3xl font-bold mt-2 ${colors[type]}`}>${value.toFixed(2)}</p>
+            <p className={`text-3xl font-bold mt-2 ${colors[type]}`}>{formatCurrency(value, i18n.language)}</p>
         </div>
     );
 };

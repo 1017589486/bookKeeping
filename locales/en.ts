@@ -74,7 +74,9 @@ export default {
     "category": "Category",
     "select_category": "Select a category",
     "date": "Date",
-    "notes": "Notes"
+    "notes": "Notes",
+    "asset_account": "Asset Account",
+    "none": "None (Not recorded in asset)"
   },
   "categories": {
     "manage_categories": "Manage Categories",

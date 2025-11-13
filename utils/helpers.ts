@@ -10,26 +10,28 @@ export const getCurrentDateString = (): string => {
   return new Date().toISOString().split('T')[0];
 };
 
-export const exportToCsv = (transactions: Transaction[], billName: string) => {
-    if (transactions.length === 0) {
-        alert("No transactions to export.");
-        return;
-    }
-    const headers = ['ID', 'Date', 'Type', 'Category ID', 'Amount', 'Notes'];
-    const rows = transactions.map(t => [
-        t.id,
-        t.date,
-        t.type,
-        t.categoryId,
-        t.amount.toString(),
-        `"${t.notes.replace(/"/g, '""')}"`
-    ].join(','));
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${billName}_transactions.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+export const formatCurrency = (value: number, locale: string): string => {
+    const currency = locale.toLowerCase().startsWith('zh') ? 'CNY' : 'USD';
+    return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+    }).format(value);
+};
+
+export const exportToCsv = (data: Transaction[], filename: string) => {
+    const headers = ['id', 'date', 'type', 'categoryId', 'amount', 'notes', 'assetId'];
+    const csvRows = [
+        headers.join(','),
+        ...data.map(row => headers.map(fieldName => JSON.stringify(row[fieldName as keyof Transaction] ?? '')).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvRows], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `${filename}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 };

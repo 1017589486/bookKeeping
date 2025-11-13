@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
 import { Transaction, TransactionType, Category } from '../types';
-import { formatDate } from '../utils/helpers';
+import { formatDate, formatCurrency } from '../utils/helpers';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import CategoryIcon from '../components/CategoryIcon';
@@ -12,7 +12,7 @@ import Select from '../components/Select';
 import TransactionModal from '../components/TransactionModal';
 
 const TransactionsPage: React.FC = () => {
-    const { transactions, categories, activeBillId, addTransaction, updateTransaction, deleteTransaction, bills } = useAppContext();
+    const { transactions, categories, activeBillId, addTransaction, updateTransaction, deleteTransaction, bills, assets } = useAppContext();
     const { t, i18n } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentTx, setCurrentTx] = useState<Transaction | null>(null);
@@ -118,7 +118,7 @@ const TransactionsPage: React.FC = () => {
                                     <td className="px-6 py-4">{formatDate(transaction.date, i18n.language)}</td>
                                     <td className="px-6 py-4">{transaction.notes}</td>
                                     <td className={`px-6 py-4 text-right font-semibold ${transaction.type === TransactionType.INCOME ? 'text-secondary' : 'text-danger'}`}>
-                                        {transaction.type === TransactionType.INCOME ? '+' : '-'}${transaction.amount.toFixed(2)}
+                                        {transaction.type === TransactionType.INCOME ? '+' : '-'}{formatCurrency(transaction.amount, i18n.language)}
                                     </td>
                                     <td className="px-6 py-4 text-center space-x-2">
                                         <button onClick={() => openModal(transaction)} disabled={!canEdit} className="font-medium text-primary hover:text-indigo-500 disabled:text-gray-400 disabled:no-underline">{t('common.edit')}</button>
@@ -132,7 +132,15 @@ const TransactionsPage: React.FC = () => {
                  {filteredTransactions.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('transactions.no_transactions')}</p>}
             </div>
 
-            <TransactionModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} transaction={currentTx} categories={categories} billId={activeBillId} />
+            <TransactionModal 
+                isOpen={isModalOpen} 
+                onClose={closeModal} 
+                onSave={handleSave} 
+                transaction={currentTx} 
+                categories={categories} 
+                billId={activeBillId} 
+                assets={assets}
+            />
         </div>
     );
 };

@@ -74,7 +74,9 @@ export default {
     "category": "分类",
     "select_category": "选择一个分类",
     "date": "日期",
-    "notes": "备注"
+    "notes": "备注",
+    "asset_account": "资产账户",
+    "none": "无 (不计入资产)"
   },
   "categories": {
     "manage_categories": "管理分类",

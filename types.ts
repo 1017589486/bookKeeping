@@ -24,6 +24,7 @@ export interface Transaction {
   date: string; // YYYY-MM-DD
   notes: string;
   userId: string;
+  assetId?: string;
 }
 
 export interface Bill {

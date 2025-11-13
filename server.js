@@ -182,43 +182,106 @@ app.delete('/api/bills/:id', userScoped, (req, res) => {
     res.status(204).send();
 });
 
+
+// --- Helper for Asset Balance Update ---
+const updateAssetBalance = (db, assetId, amount, transactionType) => {
+    if (!assetId) return null;
+    const assetIndex = db.assets.findIndex(a => a.id === assetId);
+    if (assetIndex === -1) return null;
+
+    const asset = db.assets[assetIndex];
+    if (transactionType === 'income') {
+        asset.balance += amount;
+    } else { // expense
+        asset.balance -= amount;
+    }
+    db.assets[assetIndex] = asset;
+    return asset;
+};
+
+
 // --- Transactions CRUD ---
 app.post('/api/transactions', userScoped, (req, res) => {
-    const { billId } = req.body;
+    const { billId, assetId, amount, type } = req.body;
     const db = readDb();
     if (!canEditBill(req.userId, billId, db)) return res.status(403).json({ message: 'Forbidden' });
     
-    // The transaction's userId should be the person who created it.
     const newTx = { ...req.body, id: generateId(), userId: req.userId };
     db.transactions.push(newTx);
+    
+    const updatedAsset = updateAssetBalance(db, assetId, parseFloat(amount), type);
+
     writeDb(db);
-    res.status(201).json(newTx);
+    res.status(201).json({ newTransaction: newTx, updatedAsset });
 });
 
 app.put('/api/transactions/:id', userScoped, (req, res) => {
     const { id } = req.params;
     const db = readDb();
-    const tx = db.transactions.find(t => t.id === id);
-    if (!tx) return res.status(404).json({ message: 'Transaction not found' });
-    if (!canEditBill(req.userId, tx.billId, db)) return res.status(403).json({ message: 'Forbidden' });
     
-    const index = db.transactions.findIndex(t => t.id === id);
-    db.transactions[index] = { ...db.transactions[index], ...req.body };
+    const originalTxIndex = db.transactions.findIndex(t => t.id === id);
+    if (originalTxIndex === -1) return res.status(404).json({ message: 'Transaction not found' });
+    const originalTx = { ...db.transactions[originalTxIndex] };
+
+    if (!canEditBill(req.userId, originalTx.billId, db)) return res.status(403).json({ message: 'Forbidden' });
+    
+    let updatedAssets = [];
+    
+    // 1. Revert old transaction's effect on asset
+    if (originalTx.assetId) {
+        // To revert, do the opposite of the original transaction type
+        const revertType = originalTx.type === 'income' ? 'expense' : 'income';
+        const revertedAsset = updateAssetBalance(db, originalTx.assetId, originalTx.amount, revertType);
+        if (revertedAsset) updatedAssets.push(revertedAsset);
+    }
+    
+    // 2. Apply new transaction's effect on asset
+    const updatedTxData = { ...db.transactions[originalTxIndex], ...req.body };
+    const { assetId, amount, type } = updatedTxData;
+    
+    if (assetId) {
+        const newEffectAsset = updateAssetBalance(db, assetId, parseFloat(amount), type);
+        if (newEffectAsset) {
+            const existingIndex = updatedAssets.findIndex(a => a.id === newEffectAsset.id);
+            if (existingIndex > -1) {
+                // If we're updating the same asset, its balance is already correct from the two operations
+                const reloadedAsset = db.assets.find(a => a.id === newEffectAsset.id);
+                updatedAssets[existingIndex] = reloadedAsset;
+            } else {
+                updatedAssets.push(newEffectAsset);
+            }
+        }
+    }
+
+    db.transactions[originalTxIndex] = updatedTxData;
+    
     writeDb(db);
-    res.json(db.transactions[index]);
+    res.json({ updatedTransaction: updatedTxData, updatedAssets });
 });
 
 app.delete('/api/transactions/:id', userScoped, (req, res) => {
     const { id } = req.params;
     const db = readDb();
-    const tx = db.transactions.find(t => t.id === id);
-    if (!tx) return res.status(404).json({ message: 'Transaction not found' });
+    
+    const txIndex = db.transactions.findIndex(t => t.id === id);
+    if (txIndex === -1) return res.status(404).json({ message: 'Transaction not found' });
+    const tx = db.transactions[txIndex];
+    
     if (!canEditBill(req.userId, tx.billId, db)) return res.status(403).json({ message: 'Forbidden' });
+    
+    let updatedAsset = null;
+    // Revert transaction's effect
+    if (tx.assetId) {
+        // To revert, do the opposite: if income, it's an expense; if expense, it's an income.
+        const revertType = tx.type === 'income' ? 'expense' : 'income';
+        updatedAsset = updateAssetBalance(db, tx.assetId, tx.amount, revertType);
+    }
     
     db.transactions = db.transactions.filter(t => t.id !== id);
     writeDb(db);
-    res.status(204).send();
+    res.status(200).json({ deletedTransactionId: id, updatedAsset });
 });
+
 
 // --- Categories CRUD ---
 app.post('/api/categories', userScoped, (req, res) => {

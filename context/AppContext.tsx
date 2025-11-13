@@ -191,19 +191,38 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
      const response = await fetch(`${API_BASE_URL}/transactions`, {
       method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(tx),
     });
-    const newTx = await response.json();
-    setTransactions(prev => [...prev, newTx]);
+    const { newTransaction, updatedAsset } = await response.json();
+    setTransactions(prev => [...prev, newTransaction]);
+    if (updatedAsset) {
+      setAssets(prevAssets => prevAssets.map(a => a.id === updatedAsset.id ? updatedAsset : a));
+    }
   };
   const updateTransaction = async (updatedTx: Transaction) => {
     const response = await fetch(`${API_BASE_URL}/transactions/${updatedTx.id}`, {
       method: 'PUT', headers: getAuthHeaders(), body: JSON.stringify(updatedTx),
     });
-    const result = await response.json();
-    setTransactions(prev => prev.map(t => t.id === result.id ? result : t));
+    const { updatedTransaction, updatedAssets } = await response.json();
+    setTransactions(prev => prev.map(t => t.id === updatedTransaction.id ? updatedTransaction : t));
+    if (updatedAssets && updatedAssets.length > 0) {
+      setAssets(prevAssets => {
+        const newAssets = [...prevAssets];
+        updatedAssets.forEach((updatedAsset: Asset) => {
+          const index = newAssets.findIndex(a => a.id === updatedAsset.id);
+          if (index > -1) {
+            newAssets[index] = updatedAsset;
+          }
+        });
+        return newAssets;
+      });
+    }
   };
   const deleteTransaction = async (id: string) => {
-    await fetch(`${API_BASE_URL}/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
-    setTransactions(prev => prev.filter(t => t.id !== id));
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+    const { deletedTransactionId, updatedAsset } = await response.json();
+    setTransactions(prev => prev.filter(t => t.id !== deletedTransactionId));
+    if (updatedAsset) {
+        setAssets(prevAssets => prevAssets.map(a => a.id === updatedAsset.id ? updatedAsset : a));
+    }
   };
 
   // --- Categories ---
