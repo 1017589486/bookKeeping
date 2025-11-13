@@ -149,8 +149,16 @@ app.post('/api/bills', userScoped, (req, res) => {
     const db = readDb();
     const newBill = { ...req.body, id: generateId(), userId: req.userId, createdAt: new Date().toISOString().split('T')[0] };
     db.bills.push(newBill);
+
+    const newCategories = [];
+    SEED_CATEGORIES.forEach(cat => {
+        const newCat = { ...cat, id: generateId(), userId: req.userId, billId: newBill.id };
+        db.categories.push(newCat);
+        newCategories.push(newCat);
+    });
+
     writeDb(db);
-    res.status(201).json({ ...newBill, permission: 'owner' });
+    res.status(201).json({ newBill: { ...newBill, permission: 'owner' }, newCategories });
 });
 
 app.put('/api/bills/:id', userScoped, (req, res) => {
@@ -176,6 +184,7 @@ app.delete('/api/bills/:id', userScoped, (req, res) => {
 
     db.bills = db.bills.filter(b => b.id !== id);
     db.transactions = db.transactions.filter(t => t.billId !== id);
+    db.categories = db.categories.filter(c => c.billId !== id);
     db.billShares = db.billShares.filter(bs => bs.billId !== id);
     
     writeDb(db);

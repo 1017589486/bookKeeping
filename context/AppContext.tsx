@@ -165,9 +165,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const response = await fetch(`${API_BASE_URL}/bills`, {
       method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(bill),
     });
-    const newBill = await response.json();
+    const { newBill, newCategories } = await response.json();
     setBills(prev => [...prev, newBill]);
-    if (!activeBillId) setActiveBillId(newBill.id);
+    if (newCategories) {
+        setCategories(prev => [...prev, ...newCategories]);
+    }
+    setActiveBillId(newBill.id);
   };
   const updateBill = async (updatedBill: Bill) => {
     const response = await fetch(`${API_BASE_URL}/bills/${updatedBill.id}`, {
@@ -181,6 +184,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const newBills = bills.filter(b => b.id !== id);
     setBills(newBills);
     setTransactions(prev => prev.filter(t => t.billId !== id));
+    setCategories(prev => prev.filter(c => c.billId !== id));
     if (activeBillId === id) {
       setActiveBillId(newBills.length > 0 ? newBills[0].id : null);
     }
