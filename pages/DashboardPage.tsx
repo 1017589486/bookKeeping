@@ -31,13 +31,15 @@ const DailyDistributionChart: React.FC<{ transactions: Transaction[], currentDat
 
     const data = useMemo(() => {
         const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-        const dailyData = Array.from({ length: daysInMonth }, (_, i) => ({ day: String(i + 1).padStart(2, '0'), expense: 0 }));
+        const dailyData = Array.from({ length: daysInMonth }, (_, i) => ({ day: String(i + 1).padStart(2, '0'), expense: 0, income: 0 }));
 
         transactions.forEach(t => {
-            if (t.type === TransactionType.EXPENSE) {
-                const dayIndex = new Date(t.date).getDate() - 1;
-                if (dayIndex >= 0 && dayIndex < daysInMonth) {
+            const dayIndex = new Date(t.date).getDate() - 1;
+            if (dayIndex >= 0 && dayIndex < daysInMonth) {
+                if (t.type === TransactionType.EXPENSE) {
                     dailyData[dayIndex].expense += t.amount;
+                } else if (t.type === TransactionType.INCOME) {
+                    dailyData[dayIndex].income += t.amount;
                 }
             }
         });
@@ -55,6 +57,7 @@ const DailyDistributionChart: React.FC<{ transactions: Transaction[], currentDat
                         <CartesianGrid stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} strokeDasharray="0" vertical={false} />
                         <XAxis dataKey="day" tick={{ fill: tickColor, fontSize: 12 }} tickLine={false} axisLine={false} interval={1} />
                         <YAxis tick={{ fill: tickColor, fontSize: 12 }} tickLine={false} axisLine={false} domain={[0, 'dataMax + 1000']} />
+                        <Bar dataKey="income" fill="#34C759" name="Income" barSize={4} radius={[2, 2, 0, 0]} />
                         <Bar dataKey="expense" fill="#FF453A" name="Expense" barSize={4} radius={[2, 2, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
