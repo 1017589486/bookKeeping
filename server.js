@@ -332,8 +332,13 @@ function createCrudEndpoints(resource, pluralResourceName) {
         const { id } = req.params;
         const db = readDb();
         const initialLength = db[pluralResource].length;
-        db[pluralResource] = db[pluralResource].filter(item => !(item.id === id && item.userId === req.userId));
-        if (db[pluralResource].length === initialLength) return res.status(404).json({ message: `${resource} not found or access denied` });
+        const newItems = db[pluralResource].filter(item => !(item.id === id && item.userId === req.userId));
+        
+        if (newItems.length === initialLength) {
+            return res.status(404).json({ message: `${resource} not found or access denied` });
+        }
+
+        db[pluralResource] = newItems;
         writeDb(db);
         res.status(204).send();
     });
