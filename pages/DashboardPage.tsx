@@ -45,7 +45,7 @@ const DashboardPage: React.FC = () => {
   }, [activeBillCategories, t]);
 
   if (isLoading) {
-    return <div className="text-center text-text-secondary">Loading financial data...</div>;
+    return <div className="text-center text-gray-500 dark:text-gray-400">Loading financial data...</div>;
   }
 
   return (
@@ -59,31 +59,31 @@ const DashboardPage: React.FC = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="flex items-center mb-4">
             <div className="w-1 h-5 bg-primary rounded-full mr-3"></div>
-            <h3 className="text-lg font-semibold text-text-primary">{t('dashboard.expense_by_category')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.expense_by_category')}</h3>
           </div>
           <ExpensePieChart transactions={activeBillTransactions} categories={translatedCategories} />
         </div>
-        <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="flex items-center mb-4">
             <div className="w-1 h-5 bg-primary rounded-full mr-3"></div>
-            <h3 className="text-lg font-semibold text-text-primary">{t('dashboard.monthly_overview')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.monthly_overview')}</h3>
           </div>
           <IncomeExpenseBarChart transactions={activeBillTransactions} />
         </div>
       </div>
       
       {/* Recent Transactions */}
-      <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="flex items-center mb-4">
             <div className="w-1 h-5 bg-primary rounded-full mr-3"></div>
-            <h3 className="text-lg font-semibold text-text-primary">{t('dashboard.recent_transactions')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.recent_transactions')}</h3>
           </div>
           <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left text-text-secondary">
-                  <thead className="text-xs text-text-secondary uppercase bg-slate-100">
+              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                  <thead className="text-xs text-gray-700 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-900">
                       <tr>
                           <th scope="col" className="px-6 py-3 font-medium">{t('dashboard.category')}</th>
                           <th scope="col" className="px-6 py-3 font-medium">{t('dashboard.date')}</th>
@@ -95,8 +95,8 @@ const DashboardPage: React.FC = () => {
                       {recentTransactions.length > 0 ? recentTransactions.map(transaction => {
                           const category = translatedCategories.find(c => c.id === transaction.categoryId);
                           return (
-                              <tr key={transaction.id} className="bg-white border-b border-gray-200 hover:bg-slate-50">
-                                  <td className="px-6 py-4 font-medium text-text-primary whitespace-nowrap">
+                              <tr key={transaction.id} className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
                                       <div className="flex items-center">
                                         {category && <CategoryIcon icon={category.icon} color={category.color} />}
                                         <span className="ml-3">{category?.name || t('common.uncategorized')}</span>
@@ -111,7 +111,7 @@ const DashboardPage: React.FC = () => {
                           );
                       }) : (
                         <tr>
-                            <td colSpan={4} className="text-center py-8 text-text-secondary">{t('dashboard.no_recent_transactions')}</td>
+                            <td colSpan={4} className="text-center py-8 text-gray-500 dark:text-gray-400">{t('dashboard.no_recent_transactions')}</td>
                         </tr>
                       )}
                   </tbody>
@@ -135,8 +135,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, type }) => {
         balance: 'text-primary'
     };
     return (
-        <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
-            <h4 className="text-sm font-medium text-text-secondary uppercase tracking-wider">{title}</h4>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</h4>
             <p className={`text-3xl font-bold mt-2 ${colors[type]}`}>${value.toFixed(2)}</p>
         </div>
     );

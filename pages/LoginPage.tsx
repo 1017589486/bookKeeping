@@ -39,9 +39,9 @@ const LoginPage: React.FC = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1h4v1m-4 0a3 3 0 00-3 3v1a3 3 0 003 3h1a3 3 0 003-3v-1a3 3 0 00-3-3h-1zm-4 4h12M3 15v-2a3 3 0 013-3h12a3 3 0 013 3v2" />
               </svg>
-              <h1 className="text-3xl font-bold ml-3 text-text-primary">FinTrack</h1>
+              <h1 className="text-3xl font-bold ml-3 text-gray-900">FinTrack</h1>
             </div>
-            <h2 className="mt-6 text-2xl font-bold text-text-primary">{t('login.title')}</h2>
+            <h2 className="mt-6 text-2xl font-bold text-gray-900">{t('login.title')}</h2>
           </div>
 
           <div className="mt-8">
@@ -78,7 +78,7 @@ const LoginPage: React.FC = () => {
                 </Button>
               </div>
             </form>
-            <p className="mt-6 text-center text-sm text-text-secondary">
+            <p className="mt-6 text-center text-sm text-gray-500">
               {t('login.no_account')}{' '}
               <Link to="/register" className="font-medium text-primary hover:text-indigo-500">
                 {t('login.register_here')}

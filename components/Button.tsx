@@ -12,7 +12,7 @@ const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', classNam
     primary: 'bg-primary text-white hover:bg-indigo-700 focus:ring-indigo-500',
     secondary: 'bg-secondary text-white hover:bg-emerald-600 focus:ring-emerald-500',
     danger: 'bg-danger text-white hover:bg-red-600 focus:ring-red-500',
-    ghost: 'bg-transparent text-text-secondary hover:bg-gray-100 hover:text-text-primary focus:ring-indigo-500',
+    ghost: 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 focus:ring-indigo-500',
   };
 
   return (

@@ -42,15 +42,15 @@ const FamilySharingPage: React.FC = () => {
   const getBillName = (billId: string) => bills.find(b => b.id === billId)?.name || 'Unknown Bill';
 
   return (
-    <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
-      <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
-        <h2 className="text-xl font-semibold text-text-primary">{t('sharing.title')}</h2>
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t('sharing.title')}</h2>
         <Button onClick={() => openModal()} disabled={ownedBills.length === 0}>{t('sharing.invite_member')}</Button>
       </div>
       
       <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-text-secondary">
-              <thead className="text-xs text-text-secondary uppercase bg-slate-100">
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-900">
                   <tr>
                       <th scope="col" className="px-6 py-3 font-medium">{t('sharing.email')}</th>
                       <th scope="col" className="px-6 py-3 font-medium">{t('sharing.bill_shared')}</th>
@@ -60,11 +60,11 @@ const FamilySharingPage: React.FC = () => {
               </thead>
               <tbody>
                   {billShares.map(share => (
-                      <tr key={share.id} className="bg-white border-b border-gray-200 hover:bg-slate-50">
-                          <td className="px-6 py-4 font-medium text-text-primary">{share.sharedWithUserEmail}</td>
+                      <tr key={share.id} className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{share.sharedWithUserEmail}</td>
                           <td className="px-6 py-4">{getBillName(share.billId)}</td>
                           <td className="px-6 py-4 capitalize">
-                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${share.permission === 'edit' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${share.permission === 'edit' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'}`}>
                               {share.permission === 'view' ? t('sharing.view_only') : t('sharing.view_edit')}
                             </span>
                           </td>
@@ -76,8 +76,8 @@ const FamilySharingPage: React.FC = () => {
                   ))}
               </tbody>
           </table>
-          {billShares.length === 0 && <p className="text-center text-text-secondary py-8">{t('sharing.no_members')}</p>}
-           {ownedBills.length === 0 && billShares.length === 0 && <p className="text-center text-text-secondary py-8">{t('sharing.no_bills_to_share')}</p>}
+          {billShares.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('sharing.no_members')}</p>}
+           {ownedBills.length === 0 && billShares.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('sharing.no_bills_to_share')}</p>}
       </div>
 
       <ShareFormModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} share={currentShare} ownedBills={ownedBills} />

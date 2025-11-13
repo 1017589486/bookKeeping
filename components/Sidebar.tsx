@@ -16,12 +16,12 @@ const Sidebar: React.FC = () => {
     ];
 
     return (
-        <div className="hidden md:flex flex-col w-64 bg-sidebar text-sidebar-text">
-            <div className="flex items-center justify-center h-20 border-b border-gray-700">
+        <div className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-center h-20 border-b border-gray-200 dark:border-gray-700">
                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1h4v1m-4 0a3 3 0 00-3 3v1a3 3 0 003 3h1a3 3 0 003-3v-1a3 3 0 00-3-3h-1zm-4 4h12M3 15v-2a3 3 0 013-3h12a3 3 0 013 3v2" />
                 </svg>
-                <h1 className="text-2xl font-bold ml-3 text-white">FinTrack</h1>
+                <h1 className="text-2xl font-bold ml-3 text-gray-900 dark:text-white">FinTrack</h1>
             </div>
             <nav className="flex-1 px-2 py-4 space-y-2">
                 {navItems.map((item) => (
@@ -31,8 +31,8 @@ const Sidebar: React.FC = () => {
                         className={({ isActive }) =>
                             `flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200 ${
                                 isActive
-                                    ? 'bg-sidebar-active text-white'
-                                    : 'hover:bg-sidebar-hover hover:text-white'
+                                    ? 'bg-primary text-white'
+                                    : 'hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
                             }`
                         }
                     >

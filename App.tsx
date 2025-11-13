@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { useAppContext } from './hooks/useAppContext';
+import { ThemeProvider } from './context/ThemeContext';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -19,8 +20,8 @@ const AppContent: React.FC = () => {
 
     if (isLoading && !isAuthenticated) { // Show loading screen only when initially checking auth
         return (
-            <div className="flex items-center justify-center h-screen bg-background">
-                <div className="text-xl font-semibold text-text-primary">Loading...</div>
+            <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+                <div className="text-xl font-semibold text-gray-900 dark:text-gray-100">Loading...</div>
             </div>
         );
     }
@@ -93,11 +94,13 @@ const AppContent: React.FC = () => {
 
 function App() {
   return (
-    <AppProvider>
-      <HashRouter>
-        <AppContent />
-      </HashRouter>
-    </AppProvider>
+    <ThemeProvider>
+      <AppProvider>
+        <HashRouter>
+          <AppContent />
+        </HashRouter>
+      </AppProvider>
+    </ThemeProvider>
   );
 }
 

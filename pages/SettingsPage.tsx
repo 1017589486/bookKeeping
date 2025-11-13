@@ -35,10 +35,10 @@ const SettingsPage: React.FC = () => {
 
     return (
         <div className="space-y-8 max-w-4xl mx-auto">
-            <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
-                <div className="flex items-center border-b border-slate-200 pb-4 mb-6">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
                     <div className="w-1 h-5 bg-primary rounded-full mr-3 flex-shrink-0"></div>
-                    <h3 className="text-lg font-semibold text-text-primary">{t('settings.personal_info')}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('settings.personal_info')}</h3>
                 </div>
                 <form onSubmit={handleInfoSubmit} className="space-y-4">
                     <Input label={t('settings.full_name')} value={name} onChange={e => setName(e.target.value)} required />
@@ -48,10 +48,10 @@ const SettingsPage: React.FC = () => {
                     </div>
                 </form>
             </div>
-            <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
-                <div className="flex items-center border-b border-slate-200 pb-4 mb-6">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
                     <div className="w-1 h-5 bg-primary rounded-full mr-3 flex-shrink-0"></div>
-                    <h3 className="text-lg font-semibold text-text-primary">{t('settings.change_password')}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('settings.change_password')}</h3>
                 </div>
                  <form onSubmit={handlePasswordSubmit} className="space-y-4">
                     <Input label={t('settings.current_password')} type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />

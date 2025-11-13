@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Transaction, TransactionType, Category } from '../types';
@@ -69,10 +70,10 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
         <Modal isOpen={isOpen} onClose={onClose} title={transaction ? t('transactions.edit_transaction') : t('transactions.add_transaction')}>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <span className="text-sm font-medium text-text-secondary">{t('transactions.type')}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('transactions.type')}</span>
                     <div className="mt-2 grid grid-cols-2 gap-3">
-                        <button type="button" onClick={() => handleTypeChange(TransactionType.EXPENSE)} className={`px-4 py-2 rounded-md transition-colors ${type === TransactionType.EXPENSE ? 'bg-danger text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>{t('transactionTypes.expense')}</button>
-                        <button type="button" onClick={() => handleTypeChange(TransactionType.INCOME)} className={`px-4 py-2 rounded-md transition-colors ${type === TransactionType.INCOME ? 'bg-secondary text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>{t('transactionTypes.income')}</button>
+                        <button type="button" onClick={() => handleTypeChange(TransactionType.EXPENSE)} className={`px-4 py-2 rounded-md transition-colors ${type === TransactionType.EXPENSE ? 'bg-danger text-white' : 'bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-900 dark:text-gray-100'}`}>{t('transactionTypes.expense')}</button>
+                        <button type="button" onClick={() => handleTypeChange(TransactionType.INCOME)} className={`px-4 py-2 rounded-md transition-colors ${type === TransactionType.INCOME ? 'bg-secondary text-white' : 'bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-900 dark:text-gray-100'}`}>{t('transactionTypes.income')}</button>
                     </div>
                 </div>
                 <Input label={t('dashboard.amount')} type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} required />

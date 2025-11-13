@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
@@ -68,9 +69,9 @@ const TransactionsPage: React.FC = () => {
     };
 
     return (
-        <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
-                <h2 className="text-xl font-semibold text-text-primary">{activeBillName}</h2>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{activeBillName}</h2>
                 <Button onClick={() => openModal()} disabled={!canEdit}>{t('transactions.add_transaction')}</Button>
             </div>
 
@@ -95,8 +96,8 @@ const TransactionsPage: React.FC = () => {
 
             {/* Transactions Table */}
             <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left text-text-secondary">
-                    <thead className="text-xs text-text-secondary uppercase bg-slate-100">
+                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead className="text-xs text-gray-700 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-900">
                         <tr>
                             <th scope="col" className="px-6 py-3 font-medium">{t('dashboard.category')}</th>
                             <th scope="col" className="px-6 py-3 font-medium">{t('dashboard.date')}</th>
@@ -109,10 +110,10 @@ const TransactionsPage: React.FC = () => {
                         {filteredTransactions.map(transaction => {
                             const category = categories.find(c => c.id === transaction.categoryId);
                             return (
-                                <tr key={transaction.id} className="bg-white border-b border-gray-200 hover:bg-slate-50">
+                                <tr key={transaction.id} className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td className="px-6 py-4 flex items-center">
                                         {category && <CategoryIcon icon={category.icon} color={category.color} />}
-                                        <span className="ml-3 font-medium text-text-primary">{getCategoryName(category)}</span>
+                                        <span className="ml-3 font-medium text-gray-900 dark:text-gray-100">{getCategoryName(category)}</span>
                                     </td>
                                     <td className="px-6 py-4">{formatDate(transaction.date, i18n.language)}</td>
                                     <td className="px-6 py-4">{transaction.notes}</td>
@@ -128,7 +129,7 @@ const TransactionsPage: React.FC = () => {
                         })}
                     </tbody>
                 </table>
-                 {filteredTransactions.length === 0 && <p className="text-center text-text-secondary py-8">{t('transactions.no_transactions')}</p>}
+                 {filteredTransactions.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('transactions.no_transactions')}</p>}
             </div>
 
             <TransactionModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} transaction={currentTx} categories={categories} billId={activeBillId} />

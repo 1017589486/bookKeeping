@@ -45,20 +45,20 @@ const ImportExportPage: React.FC = () => {
 
     return (
         <div className="space-y-8">
-            <div className="bg-card p-6 rounded-lg shadow">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center mb-4">
                   <div className="w-1 h-5 bg-primary rounded-full mr-3"></div>
-                  <h3 className="text-lg font-semibold text-text-primary">{t('import_export.export_data')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('import_export.export_data')}</h3>
                 </div>
-                <p className="text-text-secondary mb-4">{t('import_export.export_description', { billName: activeBillName })}</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">{t('import_export.export_description', { billName: activeBillName })}</p>
                 <Button onClick={handleExport} disabled={!activeBillId}>{t('import_export.export_button')}</Button>
             </div>
-            <div className="bg-card p-6 rounded-lg shadow">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center mb-4">
                   <div className="w-1 h-5 bg-primary rounded-full mr-3"></div>
-                  <h3 className="text-lg font-semibold text-text-primary">{t('import_export.import_data')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('import_export.import_data')}</h3>
                 </div>
-                <p className="text-text-secondary mb-4">{t('import_export.import_description', { billName: activeBillName })}</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">{t('import_export.import_description', { billName: activeBillName })}</p>
                 <input
                     type="file"
                     accept=".csv"
