@@ -1,14 +1,14 @@
+
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
 import { Transaction, TransactionType, Category } from '../types';
-import { formatDate, getCurrentDateString } from '../utils/helpers';
+import { formatDate } from '../utils/helpers';
 import Button from '../components/Button';
-import Modal from '../components/Modal';
 import Input from '../components/Input';
 import CategoryIcon from '../components/CategoryIcon';
 import Select from '../components/Select';
-import DateInput from '../components/DateInput';
+import TransactionModal from '../components/TransactionModal';
 
 const TransactionsPage: React.FC = () => {
     const { transactions, categories, activeBillId, addTransaction, updateTransaction, deleteTransaction, bills } = useAppContext();
@@ -47,16 +47,11 @@ const TransactionsPage: React.FC = () => {
         setIsModalOpen(false);
     };
 
-    const handleSave = (txData: Omit<Transaction, 'id' | 'billId' | 'userId'>, isNew: boolean) => {
-      if (!activeBillId) {
-          alert(t('transactions.select_bill_first'));
-          return;
-      }
-      const completeTxData = { ...txData, billId: activeBillId };
+    const handleSave = (txData: Omit<Transaction, 'id' | 'userId'>, isNew: boolean) => {
       if (isNew) {
-        addTransaction(completeTxData);
+        addTransaction(txData);
       } else if(currentTx) {
-        updateTransaction({ ...currentTx, ...completeTxData });
+        updateTransaction({ ...currentTx, ...txData });
       }
       closeModal();
     };
@@ -136,89 +131,10 @@ const TransactionsPage: React.FC = () => {
                  {filteredTransactions.length === 0 && <p className="text-center text-text-secondary py-8">{t('transactions.no_transactions')}</p>}
             </div>
 
-            <TransactionFormModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} transaction={currentTx} categories={categories} activeBillId={activeBillId} />
+            <TransactionModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} transaction={currentTx} categories={categories} billId={activeBillId} />
         </div>
     );
 };
 
-// Form Modal Component
-interface TxFormModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (txData: Omit<Transaction, 'id'| 'billId' | 'userId'>, isNew: boolean) => void;
-    transaction: Transaction | null;
-    categories: Category[];
-    activeBillId: string | null;
-}
-
-const TransactionFormModal: React.FC<TxFormModalProps> = ({ isOpen, onClose, onSave, transaction, categories, activeBillId }) => {
-    const { t } = useTranslation();
-    const [type, setType] = useState<TransactionType>(TransactionType.EXPENSE);
-    const [amount, setAmount] = useState('');
-    const [categoryId, setCategoryId] = useState('');
-    const [date, setDate] = useState(getCurrentDateString());
-    const [notes, setNotes] = useState('');
-
-    React.useEffect(() => {
-        if (transaction) {
-            setType(transaction.type);
-            setAmount(String(transaction.amount));
-            setCategoryId(transaction.categoryId);
-            setDate(transaction.date);
-            setNotes(transaction.notes);
-        } else {
-            setType(TransactionType.EXPENSE);
-            setAmount('');
-            const firstCategory = categories.find(c => c.type === TransactionType.EXPENSE && c.billId === activeBillId);
-            setCategoryId(firstCategory?.id || '');
-            setDate(getCurrentDateString());
-            setNotes('');
-        }
-    }, [transaction, isOpen, categories, activeBillId]);
-
-    const handleTypeChange = (newType: TransactionType) => {
-      setType(newType);
-      // auto-select first category of that type
-      const firstCategory = categories.find(c => c.type === newType && c.billId === activeBillId);
-      setCategoryId(firstCategory?.id || '');
-    }
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onSave({ type, amount: parseFloat(amount), categoryId, date, notes }, !transaction);
-    };
-    
-    const getCategoryName = (category: Category) => {
-        return category.isSeed ? t(category.name as any) : category.name;
-    };
-
-    const availableCategories = categories.filter(c => c.type === type && c.billId === activeBillId);
-
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} title={transaction ? t('transactions.edit_transaction') : t('transactions.add_transaction')}>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <span className="text-sm font-medium text-text-secondary">{t('transactions.type')}</span>
-                    <div className="mt-2 grid grid-cols-2 gap-3">
-                        <button type="button" onClick={() => handleTypeChange(TransactionType.EXPENSE)} className={`px-4 py-2 rounded-md transition-colors ${type === TransactionType.EXPENSE ? 'bg-danger text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>{t('transactionTypes.expense')}</button>
-                        <button type="button" onClick={() => handleTypeChange(TransactionType.INCOME)} className={`px-4 py-2 rounded-md transition-colors ${type === TransactionType.INCOME ? 'bg-secondary text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>{t('transactionTypes.income')}</button>
-                    </div>
-                </div>
-                <Input label={t('dashboard.amount')} type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} required />
-                <Select label={t('transactions.category')} value={categoryId} onChange={e => setCategoryId(e.target.value)} required>
-                    <option value="" disabled>{t('transactions.select_category')}</option>
-                    {availableCategories.map(c => <option key={c.id} value={c.id}>{getCategoryName(c)}</option>)}
-                </Select>
-                <DateInput label={t('transactions.date')} value={date} onChange={e => setDate(e.target.value)} required />
-                <Input label={t('transactions.notes')} value={notes} onChange={e => setNotes(e.target.value)} />
-
-                <div className="flex justify-end space-x-2 pt-4">
-                    <Button type="button" variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
-                    <Button type="submit">{t('common.save')}</Button>
-                </div>
-            </form>
-        </Modal>
-    );
-};
 
 export default TransactionsPage;

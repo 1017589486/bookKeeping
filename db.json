@@ -11,15 +11,24 @@
   "bills": [
     {
       "id": "bill1",
-      "name": "Personal",
+      "name": "个人账单",
       "description": "My personal daily expenses.",
-      "userId": "user1"
+      "userId": "user1",
+      "createdAt": "2023-01-15"
     },
     {
       "id": "bill2",
-      "name": "Family",
+      "name": "家庭账单",
       "description": "Shared family expenses.",
-      "userId": "user1"
+      "userId": "user1",
+      "createdAt": "2023-02-10"
+    },
+    {
+      "id": "bill3",
+      "name": "旅行账单",
+      "description": "For the summer vacation trip.",
+      "userId": "user1",
+      "createdAt": "2023-06-01"
     }
   ],
   "categories": [
@@ -80,9 +89,9 @@
       "billId": "bill1",
       "categoryId": "cat1",
       "type": "income",
-      "amount": 3000,
-      "date": "2023-10-01",
-      "notes": "Monthly Salary",
+      "amount": 12580,
+      "date": "2023-01-01",
+      "notes": "January Salary",
       "userId": "user1"
     },
     {
@@ -90,8 +99,8 @@
       "billId": "bill1",
       "categoryId": "cat2",
       "type": "expense",
-      "amount": 150.75,
-      "date": "2023-10-05",
+      "amount": 3420,
+      "date": "2023-01-05",
       "notes": "Weekly groceries",
       "userId": "user1"
     },
@@ -100,19 +109,59 @@
       "billId": "bill1",
       "categoryId": "cat3",
       "type": "expense",
-      "amount": 1200,
-      "date": "2023-10-01",
-      "notes": "October Rent",
+      "amount": 5000,
+      "date": "2023-01-01",
+      "notes": "January Rent",
       "userId": "user1"
     },
     {
       "id": "tx4",
       "billId": "bill2",
+      "categoryId": "cat1",
+      "type": "income",
+      "amount": 5280,
+      "date": "2023-02-01",
+      "notes": "Partner's salary contribution",
+      "userId": "user1"
+    },
+    {
+      "id": "tx5",
+      "billId": "bill2",
       "categoryId": "cat4",
       "type": "expense",
-      "amount": 50,
-      "date": "2023-10-03",
-      "notes": "Gas for car",
+      "amount": 7120,
+      "date": "2023-02-15",
+      "notes": "Car payment and insurance",
+      "userId": "user1"
+    },
+    {
+      "id": "tx6",
+      "billId": "bill3",
+      "categoryId": "cat1",
+      "type": "income",
+      "amount": 3000,
+      "date": "2023-06-01",
+      "notes": "Vacation savings",
+      "userId": "user1"
+    },
+    {
+      "id": "tx7",
+      "billId": "bill3",
+      "categoryId": "cat5",
+      "type": "expense",
+      "amount": 1200,
+      "date": "2023-06-10",
+      "notes": "Flights",
+      "userId": "user1"
+    },
+    {
+      "id": "tx8",
+      "billId": "bill3",
+      "categoryId": "cat5",
+      "type": "expense",
+      "amount": 3380,
+      "date": "2023-06-15",
+      "notes": "Hotel booking",
       "userId": "user1"
     }
   ],

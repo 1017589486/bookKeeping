@@ -1,3 +1,4 @@
+
 export default {
   "nav": {
     "dashboard": "仪表盘",
@@ -54,7 +55,9 @@ export default {
     "edit_bill": "编辑账本",
     "bill_name": "账本名称",
     "description": "描述",
-    "save_bill": "保存账本"
+    "save_bill": "保存账本",
+    "created_at": "创建于 {{date}}",
+    "view_details": "查看详情"
   },
   "transactions": {
     "add_transaction": "添加交易",

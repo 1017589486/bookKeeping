@@ -31,6 +31,7 @@ export interface Bill {
   name: string;
   description: string;
   userId: string;
+  createdAt: string;
   permission?: 'owner' | 'view' | 'edit';
 }
 

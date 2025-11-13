@@ -1,3 +1,4 @@
+
 export default {
   "nav": {
     "dashboard": "Dashboard",
@@ -54,7 +55,9 @@ export default {
     "edit_bill": "Edit Bill",
     "bill_name": "Bill Name",
     "description": "Description",
-    "save_bill": "Save Bill"
+    "save_bill": "Save Bill",
+    "created_at": "Created on {{date}}",
+    "view_details": "View Details"
   },
   "transactions": {
     "add_transaction": "Add Transaction",

@@ -68,7 +68,7 @@ app.post('/api/register', (req, res) => {
     const newUser = { id: generateId(), email, name: email.split('@')[0], password };
     db.users.push(newUser);
 
-    const newBill = { id: generateId(), name: 'Personal', description: 'My personal daily expenses.', userId: newUser.id };
+    const newBill = { id: generateId(), name: 'Personal', description: 'My personal daily expenses.', userId: newUser.id, createdAt: new Date().toISOString().split('T')[0] };
     db.bills.push(newBill);
 
     SEED_CATEGORIES.forEach(cat => {
@@ -141,7 +141,7 @@ const canEditBill = (userId, billId, db) => {
 // --- Bills CRUD ---
 app.post('/api/bills', userScoped, (req, res) => {
     const db = readDb();
-    const newBill = { ...req.body, id: generateId(), userId: req.userId };
+    const newBill = { ...req.body, id: generateId(), userId: req.userId, createdAt: new Date().toISOString().split('T')[0] };
     db.bills.push(newBill);
     writeDb(db);
     res.status(201).json({ ...newBill, permission: 'owner' });

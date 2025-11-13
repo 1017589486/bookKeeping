@@ -1,74 +1,150 @@
-import React, { useState } from 'react';
+
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../hooks/useAppContext';
-import { Bill } from '../types';
+import { Bill, TransactionType } from '../types';
 import Button from '../components/Button';
 import Modal from '../components/Modal';
 import Input from '../components/Input';
+import BillCard from '../components/BillCard';
+import TransactionModal from '../components/TransactionModal';
 
 const BillsPage: React.FC = () => {
-  const { bills, addBill, updateBill, deleteBill } = useAppContext();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { bills, addBill, updateBill, deleteBill, transactions, setActiveBillId, addTransaction, updateTransaction, categories } = useAppContext();
+  const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const [currentBill, setCurrentBill] = useState<Bill | null>(null);
-  const { t } = useTranslation();
+  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
+  const [txModalBillId, setTxModalBillId] = useState<string | null>(null);
+  const [editingTx, setEditingTx] = useState<any>(null);
 
-  const openModal = (bill: Bill | null = null) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const openBillModal = (bill: Bill | null = null) => {
     setCurrentBill(bill);
-    setIsModalOpen(true);
+    setIsBillModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeBillModal = () => {
+    setIsBillModalOpen(false);
     setCurrentBill(null);
   };
 
-  const handleSave = (billData: Omit<Bill, 'id' | 'userId'>) => {
+  const handleBillSave = (billData: Omit<Bill, 'id' | 'userId' | 'createdAt'>) => {
     if (currentBill) {
       updateBill({ ...currentBill, ...billData });
     } else {
       addBill(billData);
     }
-    closeModal();
+    closeBillModal();
   };
   
-  const handleDelete = (id: string) => {
+  const handleBillDelete = (id: string) => {
     if (window.confirm(t('bills.delete_confirm'))) {
         deleteBill(id);
     }
   }
 
+  const billStats = useMemo(() => {
+    const statsMap = new Map<string, { income: number; expense: number; balance: number }>();
+    bills.forEach(bill => {
+        statsMap.set(bill.id, { income: 0, expense: 0, balance: 0 });
+    });
+    transactions.forEach(tx => {
+        if (statsMap.has(tx.billId)) {
+            const current = statsMap.get(tx.billId)!;
+            if (tx.type === TransactionType.INCOME) {
+                current.income += tx.amount;
+            } else {
+                current.expense += tx.amount;
+            }
+            current.balance = current.income - current.expense;
+        }
+    });
+    return statsMap;
+  }, [bills, transactions]);
+
+  const openTxModal = (billId: string) => {
+    setTxModalBillId(billId);
+    setIsTxModalOpen(true);
+  };
+
+  const closeTxModal = () => {
+    setTxModalBillId(null);
+    setEditingTx(null);
+    setIsTxModalOpen(false);
+  };
+
+  const handleTxSave = (txData: Omit<any, 'id' | 'userId'>, isNew: boolean) => {
+    if (isNew) {
+      addTransaction(txData);
+    } else if(editingTx) {
+      updateTransaction({ ...editingTx, ...txData });
+    }
+    closeTxModal();
+  };
+
+  const handleViewDetails = (billId: string) => {
+    setActiveBillId(billId);
+    navigate('/transactions');
+  };
+
+  const BORDER_COLORS = ['border-indigo-500', 'border-sky-400', 'border-amber-400', 'border-emerald-500', 'border-rose-500'];
+
   return (
-    <div className="bg-card p-6 rounded-lg shadow-md border border-slate-200">
-      <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
+    <div>
+      <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-text-primary">{t('bills.manage_bills')}</h2>
-        <Button onClick={() => openModal()}>{t('bills.add_bill')}</Button>
+        <Button onClick={() => openBillModal()}>{t('bills.add_bill')}</Button>
       </div>
       
-      <div className="space-y-4">
-        {bills.map(bill => {
-          const canEdit = bill.permission !== 'view';
-          return (
-            <div key={bill.id} className="flex justify-between items-center p-4 border border-slate-200 rounded-lg hover:shadow-sm transition-shadow">
-              <div>
-                <p className="font-semibold text-text-primary">{bill.name}</p>
-                <p className="text-sm text-text-secondary">{bill.description}</p>
-                {bill.permission !== 'owner' && (
-                  <span className={`mt-2 inline-block text-xs font-semibold px-2 py-1 rounded-full ${bill.permission === 'edit' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                    {t('sharing.shared_bill')}
-                  </span>
-                )}
-              </div>
-              <div className="space-x-2">
-                <Button variant="ghost" onClick={() => openModal(bill)} disabled={!canEdit}>{t('common.edit')}</Button>
-                <Button variant="ghost" className="text-danger hover:bg-red-50" onClick={() => handleDelete(bill.id)} disabled={!canEdit}>{t('common.delete')}</Button>
-              </div>
-            </div>
-          )
-        })}
-        {bills.length === 0 && <p className="text-center text-text-secondary py-8">{t('bills.no_bills')}</p>}
-      </div>
+      {bills.length > 0 ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {bills.map((bill, index) => {
+             const canEdit = bill.permission !== 'view';
+            return (
+              <BillCard
+                key={bill.id}
+                bill={bill}
+                stats={billStats.get(bill.id) || { income: 0, expense: 0, balance: 0 }}
+                borderColor={BORDER_COLORS[index % BORDER_COLORS.length]}
+                onViewDetails={() => handleViewDetails(bill.id)}
+                onAddTransaction={() => openTxModal(bill.id)}
+                onEdit={() => openBillModal(bill)}
+                onDelete={() => handleBillDelete(bill.id)}
+                canEdit={canEdit}
+              />
+            );
+          })}
+        </div>
+      ) : (
+         <div className="text-center py-16 bg-card border-2 border-dashed border-gray-300 rounded-lg">
+           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-text-primary">{t('bills.no_bills')}</h3>
+          <div className="mt-6">
+            <Button onClick={() => openBillModal()}>
+              <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
+              {t('bills.add_bill')}
+            </Button>
+          </div>
+        </div>
+      )}
 
-      <BillFormModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} bill={currentBill} />
+
+      <BillFormModal isOpen={isBillModalOpen} onClose={closeBillModal} onSave={handleBillSave} bill={currentBill} />
+      <TransactionModal 
+        isOpen={isTxModalOpen}
+        onClose={closeTxModal}
+        onSave={handleTxSave}
+        transaction={editingTx}
+        categories={categories}
+        billId={txModalBillId}
+      />
     </div>
   );
 };
@@ -77,7 +153,7 @@ const BillsPage: React.FC = () => {
 interface BillFormModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (billData: Omit<Bill, 'id' | 'userId'>) => void;
+    onSave: (billData: Omit<Bill, 'id' | 'userId' | 'createdAt'>) => void;
     bill: Bill | null;
 }
 const BillFormModal: React.FC<BillFormModalProps> = ({ isOpen, onClose, onSave, bill }) => {
