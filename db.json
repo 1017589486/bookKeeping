@@ -81,6 +81,26 @@
       "color": "#8B5CF6",
       "userId": "user1",
       "billId": "bill1"
+    },
+    {
+      "id": "cat6",
+      "name": "住房",
+      "isSeed": false,
+      "type": "expense",
+      "icon": "home",
+      "color": "#FF9500",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat7",
+      "name": "其它",
+      "isSeed": false,
+      "type": "expense",
+      "icon": "briefcase",
+      "color": "#FF2D55",
+      "userId": "user1",
+      "billId": "bill1"
     }
   ],
   "transactions": [
@@ -162,6 +182,26 @@
       "amount": 3380,
       "date": "2023-06-15",
       "notes": "Hotel booking",
+      "userId": "user1"
+    },
+    {
+      "id": "tx_2025_nov_1",
+      "billId": "bill1",
+      "categoryId": "cat6",
+      "type": "expense",
+      "amount": 5700,
+      "date": "2025-11-01",
+      "notes": "November Rent",
+      "userId": "user1"
+    },
+    {
+      "id": "tx_2025_nov_6",
+      "billId": "bill1",
+      "categoryId": "cat7",
+      "type": "expense",
+      "amount": 1622,
+      "date": "2025-11-06",
+      "notes": "Miscellaneous",
       "userId": "user1"
     }
   ],
