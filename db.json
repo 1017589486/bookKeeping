@@ -165,5 +165,28 @@
       "userId": "user1"
     }
   ],
-  "billShares": []
+  "billShares": [],
+  "assets": [
+    {
+      "id": "asset1",
+      "userId": "user1",
+      "name": "BofA Checking",
+      "type": "Bank Account",
+      "balance": 5230.5
+    },
+    {
+      "id": "asset2",
+      "userId": "user1",
+      "name": "Cash Wallet",
+      "type": "Cash",
+      "balance": 350
+    },
+    {
+      "id": "asset3",
+      "userId": "user1",
+      "name": "Robinhood",
+      "type": "Investment",
+      "balance": 12500
+    }
+  ]
 }

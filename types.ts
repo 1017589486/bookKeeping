@@ -16,7 +16,7 @@ export interface Category {
 }
 
 export interface Transaction {
-  id: string;
+  id:string;
   billId: string;
   categoryId: string;
   type: TransactionType;
@@ -49,4 +49,12 @@ export interface User {
   email: string;
   name: string;
   password?: string;
+}
+
+export interface Asset {
+  id: string;
+  userId: string;
+  name: string;
+  type: string;
+  balance: number;
 }

@@ -5,6 +5,7 @@ export default {
     "bills": "Bills",
     "transactions": "Transactions",
     "categories": "Categories",
+    "assets": "Assets",
     "import_export": "Import/Export",
     "sharing": "Family Sharing",
     "settings": "Settings"
@@ -88,6 +89,18 @@ export default {
     "icon": "Icon",
     "color": "Color",
     "save_category": "Save Category"
+  },
+  "assets": {
+    "title": "Asset Management",
+    "add_asset": "Add New Asset",
+    "edit_asset": "Edit Asset",
+    "asset_name": "Asset Name",
+    "asset_type": "Asset Type",
+    "balance": "Current Balance",
+    "save_asset": "Save Asset",
+    "no_assets": "No assets found. Add one to get started.",
+    "delete_confirm": "Are you sure you want to delete this asset?",
+    "total_assets": "Total Assets"
   },
   "import_export": {
     "export_data": "Export Data",

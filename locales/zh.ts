@@ -5,6 +5,7 @@ export default {
     "bills": "账本",
     "transactions": "交易记录",
     "categories": "分类",
+    "assets": "资产",
     "import_export": "导入/导出",
     "sharing": "家庭共享",
     "settings": "设置"
@@ -88,6 +89,18 @@ export default {
     "icon": "图标",
     "color": "颜色",
     "save_category": "保存分类"
+  },
+  "assets": {
+    "title": "资产管理",
+    "add_asset": "添加新资产",
+    "edit_asset": "编辑资产",
+    "asset_name": "资产名称",
+    "asset_type": "资产类型",
+    "balance": "当前余额",
+    "save_asset": "保存资产",
+    "no_assets": "未找到资产。请添加一个开始使用。",
+    "delete_confirm": "您确定要删除此资产吗？",
+    "total_assets": "总资产"
   },
   "import_export": {
     "export_data": "导出数据",

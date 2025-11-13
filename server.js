@@ -127,6 +127,12 @@ app.get('/api/billShares', userScoped, (req, res) => {
     res.json(db.billShares.filter(bs => bs.ownerUserId === req.userId));
 });
 
+app.get('/api/assets', userScoped, (req, res) => {
+    const db = readDb();
+    res.json(db.assets.filter(a => a.userId === req.userId));
+});
+
+
 // --- Permission Check Helper ---
 const canEditBill = (userId, billId, db) => {
     const bill = db.bills.find(b => b.id === billId);
@@ -332,6 +338,8 @@ function createCrudEndpoints(resource, pluralResourceName) {
         res.status(204).send();
     });
 }
+
+createCrudEndpoints('asset', 'assets');
 
 
 app.listen(PORT, () => {

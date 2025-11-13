@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
@@ -9,6 +10,7 @@ import DashboardPage from './pages/DashboardPage';
 import BillsPage from './pages/BillsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import CategoriesPage from './pages/CategoriesPage';
+import AssetsPage from './pages/AssetsPage';
 import ImportExportPage from './pages/ImportExportPage';
 import FamilySharingPage from './pages/FamilySharingPage';
 import SettingsPage from './pages/SettingsPage';
@@ -59,6 +61,14 @@ const AppContent: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Layout><CategoriesPage /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+           <Route 
+            path="/assets" 
+            element={
+              <ProtectedRoute>
+                <Layout><AssetsPage /></Layout>
               </ProtectedRoute>
             } 
           />
