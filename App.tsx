@@ -17,6 +17,7 @@ import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import AssetDetailPage from './pages/AssetDetailPage';
+import StatisticsPage from './pages/StatisticsPage';
 
 const AppContent: React.FC = () => {
     const { isLoading, isAuthenticated } = useAppContext();
@@ -78,6 +79,14 @@ const AppContent: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Layout><AssetDetailPage /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+           <Route 
+            path="/statistics" 
+            element={
+              <ProtectedRoute>
+                <Layout><StatisticsPage /></Layout>
               </ProtectedRoute>
             } 
           />

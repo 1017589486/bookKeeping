@@ -6,6 +6,7 @@ export default {
     "transactions": "交易记录",
     "categories": "分类",
     "assets": "资产",
+    "statistics": "统计",
     "import_export": "导入/导出",
     "sharing": "家庭共享",
     "settings": "设置"
@@ -78,7 +79,8 @@ export default {
     "date": "日期",
     "notes": "备注",
     "asset_account": "资产账户",
-    "none": "无 (不计入资产)"
+    "none": "无 (不计入资产)",
+    "categoryId": "分类"
   },
   "categories": {
     "manage_categories": "管理分类",
@@ -127,15 +129,59 @@ export default {
     "income_ratio": "收入占比",
     "expense_ratio": "支出占比"
   },
+  "statistics": {
+    "title": "财务统计",
+    "no_bill_selected": "请选择一个账本以查看统计数据。",
+    "period": "周期",
+    "monthly": "月度",
+    "quarterly": "季度",
+    "yearly": "年度",
+    "period_summary": "周期汇总",
+    "total_income": "总收入",
+    "total_expense": "总支出",
+    "net_balance": "净余额",
+    "category_analysis": "分类分析",
+    "income_by_category": "收入分类",
+    "expense_by_category": "支出分类",
+    "comparative_analysis": "对比分析",
+    "current_period": "当前周期",
+    "previous_period": "上一周期",
+    "account_analysis": "账户分析",
+    "asset_distribution": "资产分布 (按余额)",
+    "cash_flow_by_asset": "各资产现金流 (收入/支出)",
+    "no_data_for_period": "该周期内无交易数据。"
+  },
   "import_export": {
+    "title": "导入 & 导出",
+    "importTab": "导入",
+    "exportTab": "导出",
     "export_data": "导出数据",
-    "export_description": "将当前活动账本（{{billName}}）中的所有交易导出为CSV文件。",
+    "export_description": "从当前活动账本 ({{billName}}) 导出交易记录。",
     "export_button": "导出交易",
-
     "import_data": "导入数据",
-    "import_description": "将CSV文件中的交易导入到当前活动账本（{{billName}}）。CSV文件应包含列：id, date, type, categoryId, amount, notes。",
-    "import_button": "从CSV导入",
-    "import_success": "导入成功！"
+    "import_description": "将 CSV 文件中的交易记录导入到当前账本。请使用模板以确保格式正确。",
+    "import_button": "导入交易",
+    "importSuccess": "成功导入 {{count}} 条交易记录！",
+    "noActiveBillTitle": "未选择账本",
+    "noActiveBill": "请从页面顶部选择一个账本以进行导入或导出。",
+    "exportSettings": "导出设置",
+    "dateRange": "日期范围",
+    "from": "从",
+    "to": "到",
+    "fileFormat": "文件格式",
+    "dragAndDrop": "将文件拖放到此处，或",
+    "browseFile": "浏览文件",
+    "supportedFormats": "支持格式：CSV",
+    "downloadTemplate": "下载模板",
+    "importPreview": "导入预览",
+    "previewDescription": "请在导入前检查您的数据。无效行将以红色突出显示。",
+    "importingStatus": "正在导入...",
+    "errors": {
+      "invalidDate": "无效日期格式 (YYYY-MM-DD)",
+      "invalidType": "无效类型 (必须是 'income' 或 'expense')",
+      "invalidAmount": "无效金额",
+      "invalidCategory": "在此账本和类型下找不到分类"
+    }
   },
   "sharing": {
     "title": "家庭共享",

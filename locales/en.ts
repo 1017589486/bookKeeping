@@ -6,6 +6,7 @@ export default {
     "transactions": "Transactions",
     "categories": "Categories",
     "assets": "Assets",
+    "statistics": "Statistics",
     "import_export": "Import/Export",
     "sharing": "Family Sharing",
     "settings": "Settings"
@@ -78,7 +79,8 @@ export default {
     "date": "Date",
     "notes": "Notes",
     "asset_account": "Asset Account",
-    "none": "None (Not recorded in asset)"
+    "none": "None (Not recorded in asset)",
+    "categoryId": "Category"
   },
   "categories": {
     "manage_categories": "Manage Categories",
@@ -127,14 +129,59 @@ export default {
     "income_ratio": "Income Ratio",
     "expense_ratio": "Expense Ratio"
   },
+  "statistics": {
+    "title": "Financial Statistics",
+    "no_bill_selected": "Please select a bill to view statistics.",
+    "period": "Period",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "yearly": "Yearly",
+    "period_summary": "Period Summary",
+    "total_income": "Total Income",
+    "total_expense": "Total Expense",
+    "net_balance": "Net Balance",
+    "category_analysis": "Category Analysis",
+    "income_by_category": "Income by Category",
+    "expense_by_category": "Expense by Category",
+    "comparative_analysis": "Comparative Analysis",
+    "current_period": "Current Period",
+    "previous_period": "Previous Period",
+    "account_analysis": "Account Analysis",
+    "asset_distribution": "Asset Distribution (by Balance)",
+    "cash_flow_by_asset": "Cash Flow by Asset (Income/Expense)",
+    "no_data_for_period": "No transaction data for this period."
+  },
   "import_export": {
+    "title": "Import & Export",
+    "importTab": "Import",
+    "exportTab": "Export",
     "export_data": "Export Data",
-    "export_description": "Export all transactions from the currently active bill ({{billName}}) to a CSV file.",
+    "export_description": "Export transactions from the currently active bill ({{billName}}).",
     "export_button": "Export Transactions",
     "import_data": "Import Data",
-    "import_description": "Import transactions from a CSV file into the currently active bill ({{billName}}). The CSV should have columns: id, date, type, categoryId, amount, notes.",
-    "import_button": "Import from CSV",
-    "import_success": "Import successful!"
+    "import_description": "Import transactions from a CSV file into the current bill. Use the template for correct format.",
+    "import_button": "Import Transactions",
+    "importSuccess": "Successfully imported {{count}} transactions!",
+    "noActiveBillTitle": "No Bill Selected",
+    "noActiveBill": "Please select a bill from the header to import or export data.",
+    "exportSettings": "Export Settings",
+    "dateRange": "Date Range",
+    "from": "From",
+    "to": "To",
+    "fileFormat": "File Format",
+    "dragAndDrop": "Drag & drop your file here, or",
+    "browseFile": "Browse file",
+    "supportedFormats": "Supported format: CSV",
+    "downloadTemplate": "Download Template",
+    "importPreview": "Import Preview",
+    "previewDescription": "Please review your data before importing. Invalid rows are highlighted in red.",
+    "importingStatus": "Importing...",
+    "errors": {
+      "invalidDate": "Invalid date format (YYYY-MM-DD)",
+      "invalidType": "Invalid type (must be 'income' or 'expense')",
+      "invalidAmount": "Invalid amount",
+      "invalidCategory": "Category not found for this bill and type"
+    }
   },
   "sharing": {
     "title": "Family Sharing",
