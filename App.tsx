@@ -17,7 +17,6 @@ import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import AssetDetailPage from './pages/AssetDetailPage';
-import AddTransactionPage from './pages/AddTransactionPage';
 
 const AppContent: React.FC = () => {
     const { isLoading, isAuthenticated } = useAppContext();
@@ -103,14 +102,6 @@ const AppContent: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Layout><SettingsPage /></Layout>
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/add-transaction" 
-            element={
-              <ProtectedRoute>
-                <AddTransactionPage />
               </ProtectedRoute>
             } 
           />

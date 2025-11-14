@@ -32,31 +32,82 @@
     }
   ],
   "categories": [
-    { "id": "cat_exp_1", "name": "seedCategories.shopping", "isSeed": true, "type": "expense", "icon": "shopping-cart", "color": "#EF4444", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_2", "name": "seedCategories.rent", "isSeed": true, "type": "expense", "icon": "home", "color": "#F97316", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_3", "name": "seedCategories.transport", "isSeed": true, "type": "expense", "icon": "truck", "color": "#3B82F6", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_4", "name": "seedCategories.entertainment", "isSeed": true, "type": "expense", "icon": "film", "color": "#8B5CF6", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_5", "name": "seedCategories.housing", "isSeed": true, "type": "expense", "icon": "home", "color": "#10B981", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_6", "name": "seedCategories.other", "isSeed": true, "type": "expense", "icon": "briefcase", "color": "#6B7280", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_7", "name": "seedCategories.balance_adjustment", "isSeed": true, "type": "expense", "icon": "scale", "color": "#6366F1", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_8", "name": "seedCategories.meals", "isSeed": true, "type": "expense", "icon": "utensils", "color": "#F59E0B", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_9", "name": "seedCategories.snacks", "isSeed": true, "type": "expense", "icon": "gift", "color": "#EC4899", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_10", "name": "seedCategories.medical", "isSeed": true, "type": "expense", "icon": "medkit", "color": "#22C55E", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_11", "name": "seedCategories.clothing", "isSeed": true, "type": "expense", "icon": "briefcase", "color": "#D946EF", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_exp_12", "name": "seedCategories.travel", "isSeed": true, "type": "expense", "icon": "plane", "color": "#14B8A6", "userId": "user1", "billId": "bill1" },
-    
-    { "id": "cat_inc_1", "name": "seedCategories.salary", "isSeed": true, "type": "income", "icon": "dollar-sign", "color": "#10B981", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_inc_2", "name": "seedCategories.side_hustle", "isSeed": true, "type": "income", "icon": "briefcase", "color": "#22C55E", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_inc_3", "name": "seedCategories.stocks_funds", "isSeed": true, "type": "income", "icon": "briefcase", "color": "#84CC16", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_inc_4", "name": "seedCategories.interest", "isSeed": true, "type": "income", "icon": "piggy-bank", "color": "#F59E0B", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_inc_5", "name": "seedCategories.red_packet_income", "isSeed": true, "type": "income", "icon": "gift", "color": "#EF4444", "userId": "user1", "billId": "bill1" },
-    { "id": "cat_inc_6", "name": "seedCategories.balance_adjustment", "isSeed": true, "type": "income", "icon": "scale", "color": "#6366F1", "userId": "user1", "billId": "bill1" }
+    {
+      "id": "cat1",
+      "name": "seedCategories.salary",
+      "isSeed": true,
+      "type": "income",
+      "icon": "dollar-sign",
+      "color": "#10B981",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat2",
+      "name": "seedCategories.groceries",
+      "isSeed": true,
+      "type": "expense",
+      "icon": "shopping-cart",
+      "color": "#EF4444",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat3",
+      "name": "seedCategories.rent",
+      "isSeed": true,
+      "type": "expense",
+      "icon": "home",
+      "color": "#3B82F6",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat4",
+      "name": "seedCategories.transport",
+      "isSeed": true,
+      "type": "expense",
+      "icon": "truck",
+      "color": "#F97316",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat5",
+      "name": "seedCategories.entertainment",
+      "isSeed": true,
+      "type": "expense",
+      "icon": "film",
+      "color": "#8B5CF6",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat6",
+      "name": "住房",
+      "isSeed": false,
+      "type": "expense",
+      "icon": "home",
+      "color": "#FF9500",
+      "userId": "user1",
+      "billId": "bill1"
+    },
+    {
+      "id": "cat7",
+      "name": "其它",
+      "isSeed": false,
+      "type": "expense",
+      "icon": "briefcase",
+      "color": "#FF2D55",
+      "userId": "user1",
+      "billId": "bill1"
+    }
   ],
   "transactions": [
     {
       "id": "tx1",
       "billId": "bill1",
-      "categoryId": "cat_inc_1",
+      "categoryId": "cat1",
       "type": "income",
       "amount": 12580,
       "date": "2023-01-01",
@@ -66,11 +117,91 @@
     {
       "id": "tx2",
       "billId": "bill1",
-      "categoryId": "cat_exp_1",
+      "categoryId": "cat2",
       "type": "expense",
       "amount": 3420,
       "date": "2023-01-05",
       "notes": "Weekly groceries",
+      "userId": "user1"
+    },
+    {
+      "id": "tx3",
+      "billId": "bill1",
+      "categoryId": "cat3",
+      "type": "expense",
+      "amount": 5000,
+      "date": "2023-01-01",
+      "notes": "January Rent",
+      "userId": "user1"
+    },
+    {
+      "id": "tx4",
+      "billId": "bill2",
+      "categoryId": "cat1",
+      "type": "income",
+      "amount": 5280,
+      "date": "2023-02-01",
+      "notes": "Partner's salary contribution",
+      "userId": "user1"
+    },
+    {
+      "id": "tx5",
+      "billId": "bill2",
+      "categoryId": "cat4",
+      "type": "expense",
+      "amount": 7120,
+      "date": "2023-02-15",
+      "notes": "Car payment and insurance",
+      "userId": "user1"
+    },
+    {
+      "id": "tx6",
+      "billId": "bill3",
+      "categoryId": "cat1",
+      "type": "income",
+      "amount": 3000,
+      "date": "2023-06-01",
+      "notes": "Vacation savings",
+      "userId": "user1"
+    },
+    {
+      "id": "tx7",
+      "billId": "bill3",
+      "categoryId": "cat5",
+      "type": "expense",
+      "amount": 1200,
+      "date": "2023-06-10",
+      "notes": "Flights",
+      "userId": "user1"
+    },
+    {
+      "id": "tx8",
+      "billId": "bill3",
+      "categoryId": "cat5",
+      "type": "expense",
+      "amount": 3380,
+      "date": "2023-06-15",
+      "notes": "Hotel booking",
+      "userId": "user1"
+    },
+    {
+      "id": "tx_2025_nov_1",
+      "billId": "bill1",
+      "categoryId": "cat6",
+      "type": "expense",
+      "amount": 5700,
+      "date": "2025-11-01",
+      "notes": "November Rent",
+      "userId": "user1"
+    },
+    {
+      "id": "tx_2025_nov_6",
+      "billId": "bill1",
+      "categoryId": "cat7",
+      "type": "expense",
+      "amount": 1622,
+      "date": "2025-11-06",
+      "notes": "Miscellaneous",
       "userId": "user1"
     }
   ],

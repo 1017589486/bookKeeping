@@ -13,7 +13,6 @@ export interface Category {
   color: string;
   userId: string;
   billId: string;
-  parentId?: string;
 }
 
 export interface Transaction {

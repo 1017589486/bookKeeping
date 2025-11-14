@@ -1,7 +1,5 @@
 {
   "name": "FinTrack Pro",
   "description": "A fully functional accounting software frontend designed to help users record and manage personal and family financial income and expenses. It supports multi-bill management, income/expense category statistics, data import/export, and family member bill sharing.",
-  "requestFramePermissions": [
-    "camera"
-  ]
+  "requestFramePermissions": []
 }

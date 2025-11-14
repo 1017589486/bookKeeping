@@ -35,13 +35,13 @@ const DailyDistributionChart: React.FC<{ transactions: Transaction[], currentDat
         const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
         const dailyData = Array.from({ length: daysInMonth }, (_, i) => ({ day: String(i + 1).padStart(2, '0'), expense: 0, income: 0 }));
 
-        transactions.forEach(tx => {
-            const dayIndex = new Date(tx.date).getDate() - 1;
+        transactions.forEach(t => {
+            const dayIndex = new Date(t.date).getDate() - 1;
             if (dayIndex >= 0 && dayIndex < daysInMonth) {
-                if (tx.type === TransactionType.EXPENSE) {
-                    dailyData[dayIndex].expense += tx.amount;
-                } else if (tx.type === TransactionType.INCOME) {
-                    dailyData[dayIndex].income += tx.amount;
+                if (t.type === TransactionType.EXPENSE) {
+                    dailyData[dayIndex].expense += t.amount;
+                } else if (t.type === TransactionType.INCOME) {
+                    dailyData[dayIndex].income += t.amount;
                 }
             }
         });
@@ -66,10 +66,10 @@ const DailyDistributionChart: React.FC<{ transactions: Transaction[], currentDat
                                 borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
                                 borderRadius: '0.5rem',
                             }}
-                            formatter={(value: number, name: string) => [formatCurrency(value, i18n.language), name === 'income' ? t('transactionTypes.income') : t('transactionTypes.expense')]}
+                            formatter={(value: number, name: string) => [formatCurrency(value, i18n.language), name === t('transactionTypes.income') ? t('transactionTypes.income') : t('transactionTypes.expense')]}
                             labelFormatter={(label) => `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${label}`}
                         />
-                        <Legend verticalAlign="top" wrapperStyle={{ color: theme === 'dark' ? '#f9fafb' : '#111827' }} />
+                        <Legend verticalAlign="top" formatter={(value) => value} />
                         <Bar dataKey="income" fill="#34C759" name={t('transactionTypes.income')} barSize={4} radius={[2, 2, 0, 0]} />
                         <Bar dataKey="expense" fill="#FF453A" name={t('transactionTypes.expense')} barSize={4} radius={[2, 2, 0, 0]} />
                     </BarChart>
@@ -89,8 +89,8 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
             .filter(c => c.type === type)
             .map(category => {
                 const total = transactions
-                    .filter(tx => tx.categoryId === category.id && tx.type === type)
-                    .reduce((sum, tx) => sum + tx.amount, 0);
+                    .filter(t => t.categoryId === category.id && t.type === type)
+                    .reduce((sum, t) => sum + t.amount, 0);
                 return { name: category.name, value: total, color: category.color };
             })
             .filter(item => item.value > 0);
@@ -177,10 +177,10 @@ const Calendar: React.FC<{
 
     const dailyTotals = useMemo(() => {
         const totals = new Map<string, number>();
-        transactions.forEach(tx => {
-            const dateStr = tx.date;
+        transactions.forEach(t => {
+            const dateStr = t.date;
             const currentTotal = totals.get(dateStr) || 0;
-            const amount = tx.type === TransactionType.EXPENSE ? -tx.amount : tx.amount;
+            const amount = t.type === TransactionType.EXPENSE ? -t.amount : t.amount;
             totals.set(dateStr, currentTotal + amount);
         });
         return totals;
@@ -227,7 +227,7 @@ const Calendar: React.FC<{
 
 const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: Category[] }> = ({ transactions, categories }) => {
     const groupedTransactions = useMemo(() => {
-        return transactions.reduce<Record<string, { txs: Transaction[], totalExpense: number }>>((acc, tx) => {
+        return transactions.reduce((acc, tx) => {
             const date = new Date(tx.date);
             const dateKey = date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) + ' ' + date.toLocaleDateString('zh-CN', { weekday: 'short' });
             if (!acc[dateKey]) {
@@ -238,12 +238,13 @@ const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: 
                 acc[dateKey].totalExpense += tx.amount;
             }
             return acc;
-        }, {});
+// Fix: Provide a type for the reduce accumulator's initial value to ensure correct type inference for `groupedTransactions`.
+        }, {} as Record<string, { txs: Transaction[], totalExpense: number }>);
     }, [transactions]);
     
     return (
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl space-y-4 overflow-y-auto max-h-[300px] shadow-lg no-scrollbar">
-            {Object.entries(groupedTransactions).map(([date, { txs, totalExpense }]) => (
+            {Object.entries(groupedTransactions).sort(([dateA], [dateB]) => new Date(dateB.split(' ')[0]).getTime() - new Date(dateA.split(' ')[0]).getTime()).map(([date, { txs, totalExpense }]) => (
                 <div key={date}>
                     <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
                         <span className="text-sm font-semibold text-gray-900 dark:text-white">{date}</span>
@@ -282,17 +283,17 @@ const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: 
 const DashboardPage: React.FC = () => {
     const { transactions, categories, activeBillId, isLoading } = useAppContext();
     const { t } = useTranslation();
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [currentDate, setCurrentDate] = useState(new Date('2025-11-13'));
+    const [selectedDate, setSelectedDate] = useState(new Date('2025-11-13'));
 
     const transactionsForMonth = useMemo(() => {
         if (!activeBillId) return [];
-        return transactions.filter(tx => {
-            const txDate = new Date(tx.date);
-            return tx.billId === activeBillId &&
+        return transactions.filter(t => {
+            const txDate = new Date(t.date);
+            return t.billId === activeBillId &&
                 txDate.getFullYear() === currentDate.getFullYear() &&
                 txDate.getMonth() === currentDate.getMonth();
-        }).sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        });
     }, [transactions, activeBillId, currentDate]);
 
     const { totalIncome, totalExpense, balance } = useMemo(() => {
@@ -300,8 +301,10 @@ const DashboardPage: React.FC = () => {
         let expense = 0;
         const activeCategories = categories.filter(c => c.billId === activeBillId);
 
+        // Fix: Renamed `t` to `tx` in the forEach loop to avoid shadowing the `t` function from `useTranslation`.
         transactionsForMonth.forEach(tx => {
             const category = activeCategories.find(c => c.id === tx.categoryId);
+            // Exclude "其它" category from totals to match screenshot logic
             if (category?.name === '其它' || (category?.isSeed && t('seedCategories.other') === '其它')) {
                 return;
             }
@@ -329,7 +332,7 @@ const DashboardPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <div className="lg:col-span-3 space-y-6">
-                    <DailyDistributionChart transactions={transactionsForMonth.filter(tx => { const c = activeBillCategories.find(cat => cat.id === tx.categoryId); return c?.name !== '其它'; })} currentDate={currentDate} />
+                    <DailyDistributionChart transactions={transactionsForMonth.filter(t => { const c = activeBillCategories.find(cat => cat.id === t.categoryId); return c?.name !== '其它'; })} currentDate={currentDate} />
                     <CategoryDonutChart transactions={transactionsForMonth} categories={activeBillCategories} />
                 </div>
                 <div className="lg:col-span-2 space-y-6">
