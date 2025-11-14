@@ -5,6 +5,7 @@ import { useTheme } from '../hooks/useTheme';
 import { Transaction, TransactionType, Category, Asset } from '../types';
 import { formatCurrency, getDateRangeForPeriod } from '../utils/helpers';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import CategoryIcon from '../components/CategoryIcon';
 
 const StatisticsPage: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -129,6 +130,7 @@ const PeriodSection: React.FC<PeriodSectionProps> = ({ dateRange, prevDateRange,
                 name: getCategoryName(category),
                 value: filteredTransactions.filter(t => t.categoryId === category.id).reduce((sum, t) => sum + t.amount, 0),
                 color: category.color,
+                icon: category.icon,
             }))
             .filter(item => item.value > 0);
         return { income: data(TransactionType.INCOME), expense: data(TransactionType.EXPENSE) };
@@ -139,13 +141,10 @@ const PeriodSection: React.FC<PeriodSectionProps> = ({ dateRange, prevDateRange,
         { name: t('transactionTypes.expense'), [t('statistics.current_period')]: stats.expense, [t('statistics.previous_period')]: prevStats.expense },
     ];
     
-    const assetDistributionData = assets.map(asset => ({ name: asset.name, value: asset.balance }));
+    const assetDistributionData = useMemo(() => assets.map(asset => ({ name: asset.name, value: asset.balance })).sort((a,b) => b.value - a.value), [assets]);
 
     const totalAssets = useMemo(() => assetDistributionData.reduce((sum, item) => sum + item.value, 0), [assetDistributionData]);
-    const largestAsset = useMemo(() => {
-        if (assetDistributionData.length === 0) return null;
-        return [...assetDistributionData].sort((a, b) => b.value - a.value)[0];
-    }, [assetDistributionData]);
+    const largestAsset = useMemo(() => assetDistributionData.length > 0 ? assetDistributionData[0] : null, [assetDistributionData]);
 
     const assetFlowData = useMemo(() => assets.map(asset => {
         const income = filteredTransactions.filter(t => t.assetId === asset.id && t.type === TransactionType.INCOME).reduce((s, t) => s + t.amount, 0);
@@ -168,10 +167,10 @@ const PeriodSection: React.FC<PeriodSectionProps> = ({ dateRange, prevDateRange,
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                  <StatCard title={t('statistics.income_by_category')}>
-                     <CategoryChart data={categoryData.income} getCategoryName={getCategoryName} />
+                     <CategoryChart data={categoryData.income} />
                  </StatCard>
                  <StatCard title={t('statistics.expense_by_category')}>
-                     <CategoryChart data={categoryData.expense} getCategoryName={getCategoryName} />
+                     <CategoryChart data={categoryData.expense} />
                  </StatCard>
             </div>
             
@@ -191,21 +190,45 @@ const PeriodSection: React.FC<PeriodSectionProps> = ({ dateRange, prevDateRange,
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <StatCard title={t('statistics.asset_distribution')}>
-                    <div className="relative h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie data={assetDistributionData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={2}>
-                                    {COLORS.map((color, index) => <Cell key={`cell-${index}`} fill={color} />)}
-                                </Pie>
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        {largestAsset && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-lg font-bold text-gray-900 dark:text-white text-center w-3/4 truncate" title={largestAsset.name}>{largestAsset.name}</span>
-                                <span className="text-sm text-gray-500 dark:text-gray-400">{totalAssets > 0 ? ((largestAsset.value / totalAssets) * 100).toFixed(1) : '0.0'}%</span>
-                            </div>
-                        )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center min-h-[300px]">
+                        <div className="relative h-[250px] md:h-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={assetDistributionData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={2}>
+                                        {assetDistributionData.map((_entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                                    </Pie>
+                                </PieChart>
+                            </ResponsiveContainer>
+                            {largestAsset && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span className="text-lg font-bold text-gray-900 dark:text-white text-center w-3/4 truncate" title={largestAsset.name}>{largestAsset.name}</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">{totalAssets > 0 ? ((largestAsset.value / totalAssets) * 100).toFixed(1) : '0.0'}%</span>
+                                </div>
+                            )}
+                        </div>
+                         <div className="space-y-4 self-center overflow-y-auto max-h-[280px] no-scrollbar">
+                            {assetDistributionData.map((asset, index) => {
+                                const percentage = totalAssets > 0 ? (asset.value / totalAssets) * 100 : 0;
+                                const color = COLORS[index % COLORS.length];
+                                return (
+                                    <div key={asset.name}>
+                                        <div className="flex justify-between items-center text-sm mb-1">
+                                            <div className="flex items-center truncate">
+                                                <CategoryIcon icon="briefcase" color={color} size="w-8 h-8" />
+                                                <span className="ml-2 font-medium text-gray-800 dark:text-gray-200 truncate" title={asset.name}>{asset.name}</span>
+                                            </div>
+                                            <span className="font-semibold text-gray-800 dark:text-gray-200 font-mono flex-shrink-0 ml-2">{formatCurrency(asset.value, i18n.language)}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                                <div className="h-1.5 rounded-full" style={{ width: `${percentage}%`, backgroundColor: color }}></div>
+                                            </div>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400 w-10 text-right font-mono">{percentage.toFixed(1)}%</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </StatCard>
                 <StatCard title={t('statistics.cash_flow_by_asset')}>
@@ -245,9 +268,8 @@ const SummaryItem: React.FC<{title: string, value: string, color: string}> = ({t
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#f97316'];
 
-const CategoryChart: React.FC<{ data: { name: string, value: number, color: string }[], getCategoryName: (c: any) => string }> = ({ data }) => {
+const CategoryChart: React.FC<{ data: { name: string; value: number; color: string; icon: string; }[] }> = ({ data }) => {
     const { t, i18n } = useTranslation();
-    const { theme } = useTheme();
     const total = useMemo(() => data.reduce((sum, item) => sum + item.value, 0), [data]);
     const largestCategory = useMemo(() => {
         if (data.length === 0) return null;
@@ -257,12 +279,12 @@ const CategoryChart: React.FC<{ data: { name: string, value: number, color: stri
     if (data.length === 0) return <div className="h-[300px] flex items-center justify-center text-gray-500">{t('dashboard.no_data')}</div>;
     
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center h-[300px]">
-            <div className="h-full relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center min-h-[300px]">
+            <div className="h-[250px] md:h-full relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={2}>
-                            {data.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                            {data.map((entry) => <Cell key={`cell-${entry.name}`} fill={entry.color} />)}
                         </Pie>
                     </PieChart>
                 </ResponsiveContainer>
@@ -273,19 +295,27 @@ const CategoryChart: React.FC<{ data: { name: string, value: number, color: stri
                     </div>
                 )}
             </div>
-            <div className="space-y-2 self-center overflow-y-auto max-h-[280px] no-scrollbar">
-                {data.slice().sort((a,b) => b.value - a.value).map(item => (
-                    <div key={item.name} className="flex items-center justify-between text-sm">
-                        <div className="flex items-center truncate">
-                            <span className="w-2 h-2 rounded-full mr-2 flex-shrink-0" style={{ backgroundColor: item.color }}></span>
-                            <span className="text-gray-600 dark:text-gray-300 truncate" title={item.name}>{item.name}</span>
+            <div className="space-y-4 self-center overflow-y-auto max-h-[280px] no-scrollbar">
+                {data.slice().sort((a,b) => b.value - a.value).map(item => {
+                    const percentage = total > 0 ? (item.value / total * 100) : 0;
+                    return (
+                        <div key={item.name}>
+                            <div className="flex justify-between items-center text-sm mb-1">
+                                <div className="flex items-center truncate">
+                                    <CategoryIcon icon={item.icon} color={item.color} size="w-8 h-8" />
+                                    <span className="ml-2 font-medium text-gray-800 dark:text-gray-200 truncate" title={item.name}>{item.name}</span>
+                                </div>
+                                <span className="font-semibold text-gray-800 dark:text-gray-200 font-mono flex-shrink-0 ml-2">{formatCurrency(item.value, i18n.language)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                    <div className="h-1.5 rounded-full" style={{ width: `${percentage}%`, backgroundColor: item.color }}></div>
+                                </div>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 w-10 text-right font-mono">{percentage.toFixed(1)}%</span>
+                            </div>
                         </div>
-                        <div className="flex items-center flex-shrink-0">
-                             <span className="text-gray-800 dark:text-gray-100 font-semibold ml-auto mr-2">{formatCurrency(item.value, i18n.language)}</span>
-                            <span className="text-gray-500 dark:text-gray-400 w-12 text-right">({(item.value / total * 100).toFixed(1)}%)</span>
-                        </div>
-                    </div>
-                ))}
+                    )
+                })}
             </div>
         </div>
     );

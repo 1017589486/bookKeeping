@@ -119,7 +119,7 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
             <div className="grid grid-cols-2 gap-4 items-center">
                 <div className="relative h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
+                        <PieChart onMouseLeave={() => setActiveCategory(largestCategory)}>
                             <Pie 
                                 data={data} 
                                 cx="50%" 
@@ -130,7 +130,6 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
                                 nameKey="name" 
                                 paddingAngle={0}
                                 onMouseEnter={(entry) => setActiveCategory(entry)}
-                                onMouseLeave={() => setActiveCategory(largestCategory)}
                             >
                                 {data.map((entry) => <Cell key={`cell-${entry.name}`} fill={entry.color} stroke={theme === 'dark' ? '#1f2937' : '#ffffff'} strokeWidth={2} />)}
                             </Pie>
