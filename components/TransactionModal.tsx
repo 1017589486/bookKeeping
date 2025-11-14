@@ -8,7 +8,7 @@ import Button from './Button';
 import Modal from './Modal';
 import Input from './Input';
 import Select from './Select';
-import DateInput from './DateInput';
+import CalendarInput from './CalendarInput';
 
 interface TransactionModalProps {
     isOpen: boolean;
@@ -97,7 +97,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                         </option>
                     ))}
                 </Select>
-                <DateInput label={t('transactions.date')} value={date} onChange={e => setDate(e.target.value)} required />
+                <CalendarInput label={t('transactions.date')} value={date} onChange={e => setDate(e.target.value)} required />
                 <Input label={t('transactions.notes')} value={notes} onChange={e => setNotes(e.target.value)} />
 
                 <div className="flex justify-end space-x-2 pt-4">
