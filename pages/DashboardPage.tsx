@@ -1,9 +1,8 @@
-
-
-import React, { useMemo, useState } from 'react';
+// Fix: Imported `useEffect` from React to resolve 'Cannot find name' error.
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
-import { Transaction, TransactionType, Category } from '../types';
+import { Transaction, TransactionType, Category, Asset } from '../types';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useTheme } from '../hooks/useTheme';
 import { formatCurrency } from '../utils/helpers';
@@ -36,7 +35,10 @@ const DailyDistributionChart: React.FC<{ transactions: Transaction[], currentDat
         const dailyData = Array.from({ length: daysInMonth }, (_, i) => ({ day: String(i + 1).padStart(2, '0'), expense: 0, income: 0 }));
 
         transactions.forEach(t => {
-            const dayIndex = new Date(t.date).getDate() - 1;
+            // FIX: Parse day from string to avoid timezone issues
+            const day = parseInt(t.date.substring(8, 10), 10);
+            const dayIndex = day - 1;
+
             if (dayIndex >= 0 && dayIndex < daysInMonth) {
                 if (t.type === TransactionType.EXPENSE) {
                     dailyData[dayIndex].expense += t.amount;
@@ -97,7 +99,13 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
     }, [transactions, categories, type]);
 
     const total = useMemo(() => data.reduce((sum, item) => sum + item.value, 0), [data]);
-    const largestCategory = useMemo(() => data.length > 0 ? data.reduce((max, item) => item.value > max.value ? item : max) : null, [data]);
+    const largestCategory = useMemo(() => data.length > 0 ? data.slice().sort((a,b) => b.value - a.value)[0] : null, [data]);
+
+    const [activeCategory, setActiveCategory] = useState(largestCategory);
+
+    useEffect(() => {
+        setActiveCategory(largestCategory);
+    }, [largestCategory]);
 
     return (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
@@ -112,23 +120,26 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
                 <div className="relative h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                            <Tooltip
-                                formatter={(value: number, name: string) => [formatCurrency(value, i18n.language), name]}
-                                contentStyle={{
-                                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-                                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-                                    borderRadius: '0.5rem',
-                                }}
-                            />
-                            <Pie data={data} cx="50%" cy="50%" innerRadius={60} outerRadius={80} dataKey="value" nameKey="name" paddingAngle={0}>
+                            <Pie 
+                                data={data} 
+                                cx="50%" 
+                                cy="50%" 
+                                innerRadius={60} 
+                                outerRadius={80} 
+                                dataKey="value" 
+                                nameKey="name" 
+                                paddingAngle={0}
+                                onMouseEnter={(entry) => setActiveCategory(entry)}
+                                onMouseLeave={() => setActiveCategory(largestCategory)}
+                            >
                                 {data.map((entry) => <Cell key={`cell-${entry.name}`} fill={entry.color} stroke={theme === 'dark' ? '#1f2937' : '#ffffff'} strokeWidth={2} />)}
                             </Pie>
                         </PieChart>
                     </ResponsiveContainer>
-                    {largestCategory && (
+                    {activeCategory && (
                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-xl font-bold text-gray-900 dark:text-white">{largestCategory.name}</span>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">{((largestCategory.value / total) * 100).toFixed(2)}%</span>
+                            <span className="text-xl font-bold text-gray-900 dark:text-white text-center w-3/4 truncate">{activeCategory.name}</span>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">{total > 0 ? ((activeCategory.value / total) * 100).toFixed(2) : '0.00'}%</span>
                         </div>
                     )}
                      {data.length === 0 && (
@@ -138,7 +149,7 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
                     )}
                 </div>
                 <div className="space-y-2 self-center overflow-y-auto max-h-[200px]">
-                  {data.map(item => (
+                  {data.slice().sort((a,b) => b.value - a.value).map(item => (
                     <div key={item.name} className="flex items-center">
                         <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: item.color }}></span>
                         <span className="text-gray-500 dark:text-gray-400 text-sm">{item.name}</span>
@@ -178,10 +189,10 @@ const Calendar: React.FC<{
     const dailyTotals = useMemo(() => {
         const totals = new Map<string, number>();
         transactions.forEach(t => {
-            const dateStr = t.date.split('T')[0];
-            const currentTotal = totals.get(dateStr) || 0;
+            const dateKey = t.date.substring(0, 10); // "YYYY-MM-DD"
+            const currentTotal = totals.get(dateKey) || 0;
             const amount = t.type === TransactionType.EXPENSE ? -t.amount : t.amount;
-            totals.set(dateStr, currentTotal + amount);
+            totals.set(dateKey, currentTotal + amount);
         });
         return totals;
     }, [transactions]);
@@ -206,30 +217,36 @@ const Calendar: React.FC<{
                 {weekdays.map(day => <div key={day}>{day}</div>)}
             </div>
             <div className="grid grid-cols-7 gap-y-1">
-                {days.map((day, index) => (
-                    <div key={index} className="flex flex-col items-center justify-start h-12 py-1">
-                        {day && (
+                {days.map((day, index) => {
+                    if (!day) return <div key={index} className="flex flex-col items-center justify-start h-12 py-1" />;
+
+                    const y = day.getFullYear();
+                    const m = String(day.getMonth() + 1).padStart(2, '0');
+                    const d = String(day.getDate()).padStart(2, '0');
+                    const dateKey = `${y}-${m}-${d}`;
+                    
+                    return (
+                        <div key={index} className="flex flex-col items-center justify-start h-12 py-1">
                             <button onClick={() => setSelectedDate(day)} className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm ${selectedDate?.toDateString() === day.toDateString() ? 'bg-primary text-white' : 'text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
                                 {day.getDate()}
                             </button>
-                        )}
-                        {day && dailyTotals.has(day.toISOString().split('T')[0]) && (
-                            <span className={`text-xs mt-1 font-mono ${dailyTotals.get(day.toISOString().split('T')[0])! < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                {dailyTotals.get(day.toISOString().split('T')[0])!.toFixed(0)}
-                            </span>
-                        )}
-                    </div>
-                ))}
+                            {dailyTotals.has(dateKey) && (
+                                <span className={`text-xs mt-1 font-mono ${dailyTotals.get(dateKey)! < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                    {dailyTotals.get(dateKey)!.toFixed(0)}
+                                </span>
+                            )}
+                        </div>
+                    )
+                })}
             </div>
         </div>
     );
 };
 
-const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: Category[] }> = ({ transactions, categories }) => {
+const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: Category[], assets: Asset[] }> = ({ transactions, categories, assets }) => {
     const groupedTransactions = useMemo(() => {
         return transactions.reduce((acc, tx) => {
-            const date = new Date(tx.date);
-            const dateKey = date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) + ' ' + date.toLocaleDateString('zh-CN', { weekday: 'short' });
+            const dateKey = tx.date.substring(0, 10);
             if (!acc[dateKey]) {
                 acc[dateKey] = { txs: [], totalExpense: 0 };
             }
@@ -238,36 +255,43 @@ const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: 
                 acc[dateKey].totalExpense += tx.amount;
             }
             return acc;
-// Fix: Provide a type for the reduce accumulator's initial value to ensure correct type inference for `groupedTransactions`.
         }, {} as Record<string, { txs: Transaction[], totalExpense: number }>);
     }, [transactions]);
-    
+
+    const formatGroupedDate = (dateKey: string) => {
+        const date = new Date(`${dateKey}T00:00:00`);
+        return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) + ' ' + date.toLocaleDateString('zh-CN', { weekday: 'short' });
+    };
+
     return (
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl space-y-4 overflow-y-auto max-h-[300px] shadow-lg no-scrollbar">
-            {Object.entries(groupedTransactions).sort(([dateA], [dateB]) => new Date(dateB.split(' ')[0]).getTime() - new Date(dateA.split(' ')[0]).getTime()).map(([date, { txs, totalExpense }]) => (
-                <div key={date}>
-                    <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{date}</span>
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl space-y-2 overflow-y-auto max-h-[300px] shadow-lg no-scrollbar">
+            {Object.entries(groupedTransactions).sort(([dateA], [dateB]) => dateB.localeCompare(dateA)).map(([dateKey, { txs, totalExpense }]) => (
+                <div key={dateKey}>
+                    <div className="flex justify-between items-center mb-1 pb-1 border-b border-gray-200 dark:border-gray-700">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatGroupedDate(dateKey)}</span>
                         {totalExpense > 0 && <span className="text-sm text-gray-500 dark:text-gray-400">支:{formatNumber(totalExpense)}</span>}
                     </div>
-                    <div className="space-y-3">
-                        {txs.map(tx => {
+                    <div className="space-y-1">
+                        {txs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(tx => {
                             const category = categories.find(c => c.id === tx.categoryId);
-                            const isExcluded = category?.name === '其它';
+                            const asset = assets.find(a => a.id === tx.assetId);
+                            const time = new Date(tx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+                            
+                            const details = [asset?.name, tx.notes, time].filter(Boolean).join('  ·  ');
+
                             return (
-                                <div key={tx.id} className="flex items-center justify-between">
-                                    <div className="flex items-center">
-                                        <span className="w-1.5 h-1.5 rounded-full mr-3" style={{backgroundColor: category?.color}}></span>
-                                        <div>
-                                            <span className="text-gray-900 dark:text-white text-sm">{category?.name}</span>
-                                            {isExcluded && <p className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-1 rounded-sm inline-block ml-2">不计收支</p>}
+                                <div key={tx.id} className="flex items-center justify-between py-1.5">
+                                    <div className="flex items-center space-x-3">
+                                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: category?.color ?? '#9ca3af' }}></span>
+                                        <div className="flex-grow">
+                                            <p className="text-gray-900 dark:text-white text-sm">{category?.name || 'Uncategorized'}</p>
+                                            {details && <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate" title={details}>{details}</p>}
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <span className={tx.type === TransactionType.EXPENSE ? 'text-red-500' : 'text-green-500'}>
+                                    <div className="text-right ml-4 flex-shrink-0">
+                                        <span className={`font-mono text-sm ${tx.type === TransactionType.EXPENSE ? 'text-red-500' : 'text-green-500'}`}>
                                             {tx.type === TransactionType.EXPENSE ? '-' : '+'}{formatNumber(tx.amount)}
                                         </span>
-                                        {isExcluded && <p className="text-xs text-gray-500 dark:text-gray-400">定期</p>}
                                     </div>
                                 </div>
                             );
@@ -281,38 +305,45 @@ const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: 
 };
 
 const DashboardPage: React.FC = () => {
-    const { transactions, categories, activeBillId, isLoading } = useAppContext();
+    const { transactions, categories, activeBillId, isLoading, assets } = useAppContext();
     const { t } = useTranslation();
-    const [currentDate, setCurrentDate] = useState(new Date('2025-11-13'));
-    const [selectedDate, setSelectedDate] = useState(new Date('2025-11-13'));
+    
+    const [currentDate, setCurrentDate] = useState(() => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        return new Date(year, month, 1);
+    });
+
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
+    useEffect(() => {
+        const today = new Date();
+        setSelectedDate(today);
+        setCurrentDate(new Date(today.getFullYear(), today.getMonth(), 1));
+    }, []);
 
     const transactionsForMonth = useMemo(() => {
         if (!activeBillId) return [];
         return transactions.filter(t => {
-            const txDate = new Date(t.date);
+            // FIX: Parse date parts from string to avoid timezone issues
+            const [year, month] = t.date.substring(0, 10).split('-').map(Number);
             return t.billId === activeBillId &&
-                txDate.getFullYear() === currentDate.getFullYear() &&
-                txDate.getMonth() === currentDate.getMonth();
+                year === currentDate.getFullYear() &&
+                month === currentDate.getMonth() + 1;
         });
     }, [transactions, activeBillId, currentDate]);
 
     const { totalIncome, totalExpense, balance } = useMemo(() => {
         let income = 0;
         let expense = 0;
-        const activeCategories = categories.filter(c => c.billId === activeBillId);
-
-        // Fix: Renamed `t` to `tx` in the forEach loop to avoid shadowing the `t` function from `useTranslation`.
+        
         transactionsForMonth.forEach(tx => {
-            const category = activeCategories.find(c => c.id === tx.categoryId);
-            // Exclude "其它" category from totals to match screenshot logic
-            if (category?.name === '其它' || (category?.isSeed && t('seedCategories.other') === '其它')) {
-                return;
-            }
             if (tx.type === TransactionType.INCOME) income += tx.amount;
             else expense += tx.amount;
         });
         return { totalIncome: income, totalExpense: expense, balance: income - expense };
-    }, [transactionsForMonth, categories, activeBillId, t]);
+    }, [transactionsForMonth]);
     
     const activeBillCategories = useMemo(() => {
         const billCategories = categories.filter(c => c.billId === activeBillId);
@@ -332,7 +363,7 @@ const DashboardPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <div className="lg:col-span-3 space-y-6">
-                    <DailyDistributionChart transactions={transactionsForMonth.filter(t => { const c = activeBillCategories.find(cat => cat.id === t.categoryId); return c?.name !== '其它'; })} currentDate={currentDate} />
+                    <DailyDistributionChart transactions={transactionsForMonth} currentDate={currentDate} />
                     <CategoryDonutChart transactions={transactionsForMonth} categories={activeBillCategories} />
                 </div>
                 <div className="lg:col-span-2 space-y-6">
@@ -345,7 +376,8 @@ const DashboardPage: React.FC = () => {
                     />
                     <DailyTransactionList 
                         transactions={transactionsForMonth} 
-                        categories={activeBillCategories} 
+                        categories={activeBillCategories}
+                        assets={assets}
                     />
                 </div>
             </div>
