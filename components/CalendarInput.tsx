@@ -12,6 +12,7 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [displayDate, setDisplayDate] = useState(new Date());
+  const [isPositionedAbove, setIsPositionedAbove] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,14 +25,39 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
   }, [value, isOpen]);
 
   useEffect(() => {
+    const calculatePosition = () => {
+        if (!isOpen || !containerRef.current) return;
+        
+        const inputRect = containerRef.current.getBoundingClientRect();
+        if (!inputRect) return;
+
+        const spaceBelow = window.innerHeight - inputRect.bottom;
+        const calendarHeight = 380; // Approximate height of the calendar popup in pixels
+
+        if (spaceBelow < calendarHeight && inputRect.top > calendarHeight) {
+            setIsPositionedAbove(true);
+        } else {
+            setIsPositionedAbove(false);
+        }
+    };
+
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
+    if (isOpen) {
+        calculatePosition();
+        window.addEventListener('resize', calculatePosition);
+        document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+        window.removeEventListener('resize', calculatePosition);
+        document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
   
   const currentYear = displayDate.getFullYear();
   const years = useMemo(() => {
@@ -107,6 +133,16 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
   if (!isNaN(selectedDate.getTime())) {
     selectedDate.setHours(0, 0, 0, 0);
   }
+  
+  const popoverClasses = [
+    'absolute',
+    'z-50',
+    'bg-white dark:bg-gray-800',
+    'rounded-lg shadow-xl border border-gray-200 dark:border-gray-700',
+    'p-4',
+    'w-72', // A bit smaller to fit better on small screens
+    isPositionedAbove ? 'bottom-full mb-2' : 'mt-2'
+  ].join(' ');
 
   return (
     <div ref={containerRef}>
@@ -127,7 +163,7 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
           </svg>
         </div>
         {isOpen && (
-          <div className="absolute z-10 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-4">
+          <div className={popoverClasses}>
             <div className="flex justify-between items-center mb-3">
               <button type="button" onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                 <svg className="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
