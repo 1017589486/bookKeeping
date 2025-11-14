@@ -46,7 +46,9 @@ export default {
     "amount": "Amount",
     "no_recent_transactions": "No recent transactions.",
     "no_expense_data": "No expense data to display",
-    "no_chart_data": "No data for chart"
+    "no_chart_data": "No data for chart",
+    "income_expense_distribution": "Income & Expense Distribution",
+    "no_data": "No Data"
   },
   "bills": {
     "manage_bills": "Manage Bills",

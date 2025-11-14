@@ -46,7 +46,9 @@ export default {
     "amount": "金额",
     "no_recent_transactions": "暂无最近交易记录。",
     "no_expense_data": "无支出数据显示",
-    "no_chart_data": "无图表数据"
+    "no_chart_data": "无图表数据",
+    "income_expense_distribution": "收支分布",
+    "no_data": "无数据"
   },
   "bills": {
     "manage_bills": "管理账本",

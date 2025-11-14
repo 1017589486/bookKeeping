@@ -4,8 +4,9 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
 import { Transaction, TransactionType, Category } from '../types';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useTheme } from '../hooks/useTheme';
+import { formatCurrency } from '../utils/helpers';
 
 const formatNumber = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -28,6 +29,7 @@ const StatCard: React.FC<{ icon: React.ReactNode; title: string; value: number; 
 
 const DailyDistributionChart: React.FC<{ transactions: Transaction[], currentDate: Date }> = ({ transactions, currentDate }) => {
     const { theme } = useTheme();
+    const { t, i18n } = useTranslation();
 
     const data = useMemo(() => {
         const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
@@ -50,15 +52,26 @@ const DailyDistributionChart: React.FC<{ transactions: Transaction[], currentDat
 
     return (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl h-[300px] flex flex-col shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">收支分布</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('dashboard.income_expense_distribution')}</h3>
             <div className="flex-grow">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} margin={{ top: 5, right: 0, left: -20, bottom: -10 }}>
+                    <BarChart data={data} margin={{ top: 20, right: 0, left: -20, bottom: -10 }}>
                         <CartesianGrid stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} strokeDasharray="0" vertical={false} />
                         <XAxis dataKey="day" tick={{ fill: tickColor, fontSize: 12 }} tickLine={false} axisLine={false} interval={1} />
                         <YAxis tick={{ fill: tickColor, fontSize: 12 }} tickLine={false} axisLine={false} domain={[0, 'dataMax + 1000']} />
-                        <Bar dataKey="income" fill="#34C759" name="Income" barSize={4} radius={[2, 2, 0, 0]} />
-                        <Bar dataKey="expense" fill="#FF453A" name="Expense" barSize={4} radius={[2, 2, 0, 0]} />
+                         <Tooltip
+                            cursor={{ fill: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }}
+                            contentStyle={{
+                                backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                                borderRadius: '0.5rem',
+                            }}
+                            formatter={(value: number, name: string) => [formatCurrency(value, i18n.language), name === t('transactionTypes.income') ? t('transactionTypes.income') : t('transactionTypes.expense')]}
+                            labelFormatter={(label) => `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${label}`}
+                        />
+                        <Legend verticalAlign="top" formatter={(value) => value} />
+                        <Bar dataKey="income" fill="#34C759" name={t('transactionTypes.income')} barSize={4} radius={[2, 2, 0, 0]} />
+                        <Bar dataKey="expense" fill="#FF453A" name={t('transactionTypes.expense')} barSize={4} radius={[2, 2, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -69,6 +82,7 @@ const DailyDistributionChart: React.FC<{ transactions: Transaction[], currentDat
 const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Category[] }> = ({ transactions, categories }) => {
     const [type, setType] = useState<TransactionType>(TransactionType.EXPENSE);
     const { theme } = useTheme();
+    const { t, i18n } = useTranslation();
 
     const data = useMemo(() => {
         return categories
@@ -87,10 +101,25 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
 
     return (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+             <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('dashboard.expense_by_category')}</h3>
+                 <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+                    <button onClick={() => setType(TransactionType.EXPENSE)} className={`px-4 py-1 text-sm rounded-md transition-colors ${type === TransactionType.EXPENSE ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 shadow' : 'text-gray-600 dark:text-gray-300'}`}>{t('transactionTypes.expense')}</button>
+                    <button onClick={() => setType(TransactionType.INCOME)} className={`px-4 py-1 text-sm rounded-md transition-colors ${type === TransactionType.INCOME ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 shadow' : 'text-gray-600 dark:text-gray-300'}`}>{t('transactionTypes.income')}</button>
+                </div>
+            </div>
             <div className="grid grid-cols-2 gap-4 items-center">
                 <div className="relative h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
+                            <Tooltip
+                                formatter={(value: number, name: string) => [formatCurrency(value, i18n.language), name]}
+                                contentStyle={{
+                                    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                    borderColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+                                    borderRadius: '0.5rem',
+                                }}
+                            />
                             <Pie data={data} cx="50%" cy="50%" innerRadius={60} outerRadius={80} dataKey="value" nameKey="name" paddingAngle={0}>
                                 {data.map((entry) => <Cell key={`cell-${entry.name}`} fill={entry.color} stroke={theme === 'dark' ? '#1f2937' : '#ffffff'} strokeWidth={2} />)}
                             </Pie>
@@ -104,7 +133,7 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
                     )}
                      {data.length === 0 && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-gray-500 dark:text-gray-400">No Data</span>
+                            <span className="text-gray-500 dark:text-gray-400">{t('dashboard.no_data')}</span>
                         </div>
                     )}
                 </div>
@@ -116,12 +145,6 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
                         <span className="text-gray-900 dark:text-white text-sm ml-auto font-medium">{formatNumber(item.value)}</span>
                     </div>
                   ))}
-                </div>
-            </div>
-            <div className="flex justify-center mt-4">
-                <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
-                    <button onClick={() => setType(TransactionType.EXPENSE)} className={`px-4 py-1 text-sm rounded-md transition-colors ${type === TransactionType.EXPENSE ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 shadow' : 'text-gray-600 dark:text-gray-300'}`}>支出</button>
-                    <button onClick={() => setType(TransactionType.INCOME)} className={`px-4 py-1 text-sm rounded-md transition-colors ${type === TransactionType.INCOME ? 'bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 shadow' : 'text-gray-600 dark:text-gray-300'}`}>收入</button>
                 </div>
             </div>
         </div>
@@ -215,11 +238,12 @@ const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: 
                 acc[dateKey].totalExpense += tx.amount;
             }
             return acc;
+// Fix: Provide a type for the reduce accumulator's initial value to ensure correct type inference for `groupedTransactions`.
         }, {} as Record<string, { txs: Transaction[], totalExpense: number }>);
     }, [transactions]);
     
     return (
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl space-y-4 overflow-y-auto max-h-[300px] shadow-lg">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl space-y-4 overflow-y-auto max-h-[300px] shadow-lg no-scrollbar">
             {Object.entries(groupedTransactions).sort(([dateA], [dateB]) => new Date(dateB.split(' ')[0]).getTime() - new Date(dateA.split(' ')[0]).getTime()).map(([date, { txs, totalExpense }]) => (
                 <div key={date}>
                     <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
