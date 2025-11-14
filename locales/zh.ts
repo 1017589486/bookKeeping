@@ -107,12 +107,31 @@ export default {
     "total_assets": "总资产",
     "asset_trend_analysis": "资产趋势分析",
     "monthly": "月度",
-    "daily": "每日"
+    "daily": "每日",
+    "view_details": "查看详情",
+    "asset_transactions": "资产交易记录",
+    "no_transactions": "该资产没有交易记录。",
+    "balance_bill": "一键平账",
+    "balance_asset_title": "资产平账",
+    "current_balance": "当前余额",
+    "actual_balance": "实际余额",
+    "balance_adjustment_notes": "平账",
+    "no_bill_for_adjustment": "无法创建平账交易，请先创建一个账本。",
+    "all_years": "所有年份",
+    "all_months": "所有月份",
+    "select_year": "选择年份",
+    "select_month": "选择月份",
+    "period_summary": "期间汇总",
+    "period_income": "期间收入",
+    "period_expense": "期间支出",
+    "income_ratio": "收入占比",
+    "expense_ratio": "支出占比"
   },
   "import_export": {
     "export_data": "导出数据",
     "export_description": "将当前活动账本（{{billName}}）中的所有交易导出为CSV文件。",
     "export_button": "导出交易",
+
     "import_data": "导入数据",
     "import_description": "将CSV文件中的交易导入到当前活动账本（{{billName}}）。CSV文件应包含列：id, date, type, categoryId, amount, notes。",
     "import_button": "从CSV导入",
@@ -162,6 +181,7 @@ export default {
     "groceries": "购物",
     "rent": "房租",
     "transport": "交通",
-    "entertainment": "娱乐"
+    "entertainment": "娱乐",
+    "balance_adjustment": "平账调整"
   }
 }

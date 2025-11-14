@@ -107,7 +107,25 @@ export default {
     "total_assets": "Total Assets",
     "asset_trend_analysis": "Asset Trend Analysis",
     "monthly": "Monthly",
-    "daily": "Daily"
+    "daily": "Daily",
+    "view_details": "View Details",
+    "asset_transactions": "Asset Transactions",
+    "no_transactions": "No transactions found for this asset.",
+    "balance_bill": "Balance Bill",
+    "balance_asset_title": "Balance Asset",
+    "current_balance": "Current Balance",
+    "actual_balance": "Actual Balance",
+    "balance_adjustment_notes": "Balancing",
+    "no_bill_for_adjustment": "Cannot create adjustment. Please create a bill first.",
+    "all_years": "All Years",
+    "all_months": "All Months",
+    "select_year": "Select Year",
+    "select_month": "Select Month",
+    "period_summary": "Period Summary",
+    "period_income": "Period Income",
+    "period_expense": "Period Expense",
+    "income_ratio": "Income Ratio",
+    "expense_ratio": "Expense Ratio"
   },
   "import_export": {
     "export_data": "Export Data",
@@ -162,6 +180,7 @@ export default {
     "groceries": "Groceries",
     "rent": "Rent",
     "transport": "Transport",
-    "entertainment": "Entertainment"
+    "entertainment": "Entertainment",
+    "balance_adjustment": "Balance Adjustment"
   }
 }

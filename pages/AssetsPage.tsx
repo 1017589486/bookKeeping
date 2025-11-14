@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../hooks/useAppContext';
 import { Asset, TransactionType } from '../types';
 import Button from '../components/Button';
@@ -14,6 +15,7 @@ import AssetTrendChart from '../components/charts/AssetTrendChart';
 const AssetsPage: React.FC = () => {
     const { assets, addAsset, updateAsset, deleteAsset, transactions } = useAppContext();
     const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
     const [trendView, setTrendView] = useState<'monthly' | 'daily'>('monthly');
@@ -142,6 +144,7 @@ const AssetsPage: React.FC = () => {
                             asset={asset}
                             onEdit={() => openModal(asset)}
                             onDelete={() => handleDelete(asset.id)}
+                            onViewDetails={() => navigate(`/assets/${asset.id}`)}
                             formatCurrency={(value) => formatCurrency(value, i18n.language)}
                         />
                     ))}

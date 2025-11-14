@@ -16,6 +16,7 @@ import FamilySharingPage from './pages/FamilySharingPage';
 import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import AssetDetailPage from './pages/AssetDetailPage';
 
 const AppContent: React.FC = () => {
     const { isLoading, isAuthenticated } = useAppContext();
@@ -69,6 +70,14 @@ const AppContent: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Layout><AssetsPage /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+           <Route 
+            path="/assets/:assetId" 
+            element={
+              <ProtectedRoute>
+                <Layout><AssetDetailPage /></Layout>
               </ProtectedRoute>
             } 
           />

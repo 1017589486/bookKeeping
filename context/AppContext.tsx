@@ -24,7 +24,7 @@ interface AppContextType {
   updateTransaction: (transaction: Transaction) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   categories: Category[];
-  addCategory: (category: Omit<Category, 'id' | 'userId'>) => Promise<void>;
+  addCategory: (category: Omit<Category, 'id' | 'userId'>) => Promise<Category>;
   updateCategory: (category: Category) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   billShares: BillShare[];
@@ -230,12 +230,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // --- Categories ---
-  const addCategory = async (cat: Omit<Category, 'id' | 'userId'>) => {
+  const addCategory = async (cat: Omit<Category, 'id' | 'userId'>): Promise<Category> => {
     const response = await fetch(`${API_BASE_URL}/categories`, {
       method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(cat),
     });
     const newCat = await response.json();
     setCategories(prev => [...prev, newCat]);
+    return newCat;
   };
   const updateCategory = async (updatedCat: Category) => {
     const response = await fetch(`${API_BASE_URL}/categories/${updatedCat.id}`, {
