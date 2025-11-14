@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../hooks/useAppContext';
 import { Transaction, TransactionType, Category } from '../types';
 import { formatDate, formatCurrency } from '../utils/helpers';
@@ -14,6 +15,7 @@ import TransactionModal from '../components/TransactionModal';
 const TransactionsPage: React.FC = () => {
     const { transactions, categories, activeBillId, addTransaction, updateTransaction, deleteTransaction, bills, assets } = useAppContext();
     const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentTx, setCurrentTx] = useState<Transaction | null>(null);
 
@@ -50,7 +52,7 @@ const TransactionsPage: React.FC = () => {
 
     const handleSave = (txData: Omit<Transaction, 'id' | 'userId'>, isNew: boolean) => {
       if (isNew) {
-        addTransaction(txData);
+        // This case is now handled by navigating to the new page
       } else if(currentTx) {
         updateTransaction({ ...currentTx, ...txData });
       }
@@ -72,7 +74,7 @@ const TransactionsPage: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{activeBillName}</h2>
-                <Button onClick={() => openModal()} disabled={!canEdit}>{t('transactions.add_transaction')}</Button>
+                <Button onClick={() => navigate('/add-transaction')} disabled={!canEdit}>{t('transactions.add_transaction')}</Button>
             </div>
 
             {/* Filters */}

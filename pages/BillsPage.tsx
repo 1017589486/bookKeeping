@@ -8,15 +8,11 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import Input from '../components/Input';
 import BillCard from '../components/BillCard';
-import TransactionModal from '../components/TransactionModal';
 
 const BillsPage: React.FC = () => {
-  const { bills, addBill, updateBill, deleteBill, transactions, setActiveBillId, addTransaction, updateTransaction, categories, assets } = useAppContext();
+  const { bills, addBill, updateBill, deleteBill, transactions, setActiveBillId } = useAppContext();
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const [currentBill, setCurrentBill] = useState<Bill | null>(null);
-  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
-  const [txModalBillId, setTxModalBillId] = useState<string | null>(null);
-  const [editingTx, setEditingTx] = useState<any>(null);
 
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -65,24 +61,10 @@ const BillsPage: React.FC = () => {
     return statsMap;
   }, [bills, transactions]);
 
-  const openTxModal = (billId: string) => {
-    setTxModalBillId(billId);
-    setIsTxModalOpen(true);
-  };
 
-  const closeTxModal = () => {
-    setTxModalBillId(null);
-    setEditingTx(null);
-    setIsTxModalOpen(false);
-  };
-
-  const handleTxSave = (txData: Omit<any, 'id' | 'userId'>, isNew: boolean) => {
-    if (isNew) {
-      addTransaction(txData);
-    } else if(editingTx) {
-      updateTransaction({ ...editingTx, ...txData });
-    }
-    closeTxModal();
+  const handleAddTransaction = (billId: string) => {
+    setActiveBillId(billId);
+    navigate('/add-transaction');
   };
 
   const handleViewDetails = (billId: string) => {
@@ -110,7 +92,7 @@ const BillsPage: React.FC = () => {
                 stats={billStats.get(bill.id) || { income: 0, expense: 0, balance: 0 }}
                 borderColor={BORDER_COLORS[index % BORDER_COLORS.length]}
                 onViewDetails={() => handleViewDetails(bill.id)}
-                onAddTransaction={() => openTxModal(bill.id)}
+                onAddTransaction={() => handleAddTransaction(bill.id)}
                 onEdit={() => openBillModal(bill)}
                 onDelete={() => handleBillDelete(bill.id)}
                 canEdit={canEdit}
@@ -121,7 +103,7 @@ const BillsPage: React.FC = () => {
       ) : (
          <div className="text-center py-16 bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
            <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2-2H5a2 2 0 01-2-2z" />
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">{t('bills.no_bills')}</h3>
           <div className="mt-6">
@@ -137,15 +119,6 @@ const BillsPage: React.FC = () => {
 
 
       <BillFormModal isOpen={isBillModalOpen} onClose={closeBillModal} onSave={handleBillSave} bill={currentBill} />
-      <TransactionModal 
-        isOpen={isTxModalOpen}
-        onClose={closeTxModal}
-        onSave={handleTxSave}
-        transaction={editingTx}
-        categories={categories}
-        billId={txModalBillId}
-        assets={assets}
-      />
     </div>
   );
 };

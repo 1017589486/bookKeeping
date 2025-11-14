@@ -80,6 +80,18 @@ export default {
     "asset_account": "Asset Account",
     "none": "None (Not recorded in asset)"
   },
+  "add_transaction": {
+    "transfer": "Transfer",
+    "notes_placeholder": "Click to add notes...",
+    "select_account": "Select Account",
+    "select_bill": "Select Bill",
+    "picture": "Picture",
+    "add_another": "Add Another",
+    "add_account": "Add Account",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "day_before": "Day Before"
+  },
   "categories": {
     "manage_categories": "Manage Categories",
     "add_category": "Add New Category",
@@ -169,7 +181,9 @@ export default {
     "edit": "Edit",
     "delete": "Delete",
     "remove": "Remove",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "manage": "Manage",
+    "confirm": "Confirm"
   },
   "transactionTypes": {
     "income": "Income",
@@ -181,6 +195,41 @@ export default {
     "rent": "Rent",
     "transport": "Transport",
     "entertainment": "Entertainment",
-    "balance_adjustment": "Balance Adjustment"
+    "balance_adjustment": "Balance Adjustment",
+    "other": "Other",
+    "meals": "Meals",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snacks": "Snacks",
+    "shopping": "Shopping",
+    "merchant_spend": "Merchant Spend",
+    "qr_payment": "QR Payment",
+    "transfer_red_packet": "Transfer/Red Packet",
+    "clothing": "Clothing",
+    "travel": "Travel",
+    "phone_web_bills": "Phone/Web Bills",
+    "daily_goods": "Daily Goods",
+    "housing": "Housing",
+    "medical": "Medical",
+    "transfer": "Transfer",
+    "car_gas": "Car/Gas",
+    "gifts": "Gifts/Treats",
+    "electronics": "Electronics",
+    "utilities": "Utilities",
+    "gold": "Gold",
+    "part_time_expense": "Part-time Expense",
+    "living_expenses": "Living Expenses",
+    "red_packet_income": "Red Packet",
+    "jd_refund": "JD Refund",
+    "didi_refund": "Didi Refund",
+    "qr_income": "QR Income",
+    "pdd_refund": "Pinduoduo Refund",
+    "wechat_red_packet": "WeChat Red Packet",
+    "side_hustle": "Side Hustle",
+    "stocks_funds": "Stocks/Funds",
+    "interest": "Interest",
+    "provident_fund": "Provident Fund",
+    "medical_insurance": "Medical Insurance"
   }
 }

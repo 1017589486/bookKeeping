@@ -80,6 +80,18 @@ export default {
     "asset_account": "资产账户",
     "none": "无 (不计入资产)"
   },
+  "add_transaction": {
+    "transfer": "转账",
+    "notes_placeholder": "点此输入备注...",
+    "select_account": "选择账户",
+    "select_bill": "选择账本",
+    "picture": "图片",
+    "add_another": "再记一笔",
+    "add_account": "添加账户",
+    "today": "今天",
+    "yesterday": "昨天",
+    "day_before": "前天"
+  },
   "categories": {
     "manage_categories": "管理分类",
     "add_category": "添加新分类",
@@ -170,7 +182,9 @@ export default {
     "edit": "编辑",
     "delete": "删除",
     "remove": "移除",
-    "uncategorized": "未分类"
+    "uncategorized": "未分类",
+    "manage": "管理",
+    "confirm": "确定"
   },
   "transactionTypes": {
     "income": "收入",
@@ -182,6 +196,41 @@ export default {
     "rent": "房租",
     "transport": "交通",
     "entertainment": "娱乐",
-    "balance_adjustment": "平账调整"
+    "balance_adjustment": "平账调整",
+    "other": "其它",
+    "meals": "三餐",
+    "breakfast": "早餐",
+    "lunch": "午餐",
+    "dinner": "晚餐",
+    "snacks": "零食",
+    "shopping": "购物",
+    "merchant_spend": "商户消费",
+    "qr_payment": "扫二维码付款",
+    "transfer_red_packet": "转账红包",
+    "clothing": "衣服",
+    "travel": "旅行",
+    "phone_web_bills": "话费网费",
+    "daily_goods": "日用品",
+    "housing": "住房",
+    "medical": "医疗",
+    "transfer": "转账",
+    "car_gas": "汽车/加油",
+    "gifts": "请客送礼",
+    "electronics": "电脑数码",
+    "utilities": "水电煤",
+    "gold": "黄金",
+    "part_time_expense": "兼职支出",
+    "living_expenses": "生活费",
+    "red_packet_income": "收红包",
+    "jd_refund": "京东商城平台商户-退款",
+    "didi_refund": "滴滴出行-退款",
+    "qr_income": "二维码收款",
+    "pdd_refund": "拼多多平台商户-退款",
+    "wechat_red_packet": "微信红包",
+    "side_hustle": "外快",
+    "stocks_funds": "股票基金",
+    "interest": "利息",
+    "provident_fund": "公积金",
+    "medical_insurance": "医保"
   }
 }
