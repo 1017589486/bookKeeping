@@ -178,7 +178,7 @@ const Calendar: React.FC<{
     const dailyTotals = useMemo(() => {
         const totals = new Map<string, number>();
         transactions.forEach(t => {
-            const dateStr = t.date;
+            const dateStr = t.date.split('T')[0];
             const currentTotal = totals.get(dateStr) || 0;
             const amount = t.type === TransactionType.EXPENSE ? -t.amount : t.amount;
             totals.set(dateStr, currentTotal + amount);

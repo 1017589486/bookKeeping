@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
 import { Transaction, TransactionType, Category } from '../types';
-import { formatDate, formatCurrency } from '../utils/helpers';
+import { formatDateTime, formatCurrency } from '../utils/helpers';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import CategoryIcon from '../components/CategoryIcon';
@@ -115,7 +115,7 @@ const TransactionsPage: React.FC = () => {
                                         {category && <CategoryIcon icon={category.icon} color={category.color} />}
                                         <span className="ml-3 font-medium text-gray-900 dark:text-gray-100">{getCategoryName(category)}</span>
                                     </td>
-                                    <td className="px-6 py-4">{formatDate(transaction.date, i18n.language)}</td>
+                                    <td className="px-6 py-4">{formatDateTime(transaction.date, i18n.language)}</td>
                                     <td className="px-6 py-4">{transaction.notes}</td>
                                     <td className={`px-6 py-4 text-right font-semibold ${transaction.type === TransactionType.INCOME ? 'text-secondary' : 'text-danger'}`}>
                                         {transaction.type === TransactionType.INCOME ? '+' : '-'}{formatCurrency(transaction.amount, i18n.language)}

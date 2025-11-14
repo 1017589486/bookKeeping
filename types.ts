@@ -21,7 +21,7 @@ export interface Transaction {
   categoryId: string;
   type: TransactionType;
   amount: number;
-  date: string; // YYYY-MM-DD
+  date: string; // ISO 8601 format
   notes: string;
   userId: string;
   assetId?: string;

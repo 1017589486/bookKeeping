@@ -6,9 +6,18 @@ export const formatDate = (dateString: string, locale: string): string => {
   return new Date(dateString).toLocaleDateString(locale, options);
 };
 
+export const formatDateTime = (dateString: string, locale: string): string => {
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+  return new Date(dateString).toLocaleString(locale, options);
+};
+
 export const getCurrentDateString = (): string => {
   return new Date().toISOString().split('T')[0];
 };
+
+export const getCurrentISOString = (): string => {
+  return new Date().toISOString();
+}
 
 export const formatCurrency = (value: number, locale: string): string => {
     const currency = locale.toLowerCase().startsWith('zh') ? 'CNY' : 'USD';

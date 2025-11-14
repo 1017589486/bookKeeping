@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Transaction, TransactionType, Category, Asset } from '../types';
-import { getCurrentDateString, formatCurrency } from '../utils/helpers';
+import { getCurrentISOString, formatCurrency } from '../utils/helpers';
 import Button from './Button';
 import Modal from './Modal';
 import Input from './Input';
@@ -25,7 +25,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
     const [type, setType] = useState<TransactionType>(TransactionType.EXPENSE);
     const [amount, setAmount] = useState('');
     const [categoryId, setCategoryId] = useState('');
-    const [date, setDate] = useState(getCurrentDateString());
+    const [date, setDate] = useState(getCurrentISOString());
     const [notes, setNotes] = useState('');
     const [assetId, setAssetId] = useState<string | undefined>(undefined);
 
@@ -43,7 +43,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
             setAmount('');
             const firstCategory = categories.find(c => c.type === TransactionType.EXPENSE && c.billId === billId);
             setCategoryId(firstCategory?.id || '');
-            setDate(getCurrentDateString());
+            setDate(getCurrentISOString());
             setNotes('');
             setAssetId(undefined);
         }
@@ -97,7 +97,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                         </option>
                     ))}
                 </Select>
-                <CalendarInput label={t('transactions.date')} value={date} onChange={e => setDate(e.target.value)} required />
+                <CalendarInput label={t('transactions.date')} value={date} onChange={e => setDate(e.target.value)} required showTime />
                 <Input label={t('transactions.notes')} value={notes} onChange={e => setNotes(e.target.value)} />
 
                 <div className="flex justify-end space-x-2 pt-4">

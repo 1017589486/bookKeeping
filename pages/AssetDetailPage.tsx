@@ -1,11 +1,12 @@
 
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
 import { Transaction, TransactionType, Category, Asset } from '../types';
 import AssetTrendChart from '../components/charts/AssetTrendChart';
-import { formatDate, formatCurrency, getCurrentDateString } from '../utils/helpers';
+import { formatDateTime, formatCurrency, getCurrentISOString } from '../utils/helpers';
 import CategoryIcon from '../components/CategoryIcon';
 import Button from '../components/Button';
 import Select from '../components/Select';
@@ -175,7 +176,7 @@ const AssetDetailPage: React.FC = () => {
                 categoryId: adjustmentCategory.id,
                 type: adjustmentType,
                 amount: Math.abs(adjustmentAmount),
-                date: getCurrentDateString(),
+                date: getCurrentISOString(),
                 notes: t('assets.balance_adjustment_notes'),
                 assetId: asset.id
             });
@@ -274,7 +275,7 @@ const AssetDetailPage: React.FC = () => {
                                 const category = categories.find(c => c.id === transaction.categoryId);
                                 return (
                                     <tr key={transaction.id} className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td className="px-6 py-4">{formatDate(transaction.date, i18n.language)}</td>
+                                        <td className="px-6 py-4">{formatDateTime(transaction.date, i18n.language)}</td>
                                         <td className="px-6 py-4 flex items-center">
                                             {category && <CategoryIcon icon={category.icon} color={category.color} />}
                                             <span className="ml-3 font-medium text-gray-900 dark:text-gray-100">{getCategoryName(category)}</span>

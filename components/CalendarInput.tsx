@@ -1,38 +1,41 @@
 
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatDateTime } from '../utils/helpers';
 
-interface CalendarInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+interface CalendarInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
   label?: string;
-  value: string; // YYYY-MM-DD
+  value: string; // YYYY-MM-DD or ISO 8601
   onChange: (e: { target: { value: string } }) => void;
+  showTime?: boolean;
 }
 
-const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChange, ...props }) => {
+const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChange, showTime = false, ...props }) => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [displayDate, setDisplayDate] = useState(new Date());
+  const [currentDisplayDate, setCurrentDisplayDate] = useState(new Date());
   const [isPositionedAbove, setIsPositionedAbove] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const selectedDate = useMemo(() => {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? new Date() : d;
+  }, [value]);
+
   useEffect(() => {
-    const initialDate = new Date(value);
-    if (!isNaN(initialDate.getTime())) {
-        setDisplayDate(initialDate);
-    } else {
-        setDisplayDate(new Date());
+    if (isOpen) {
+      setCurrentDisplayDate(selectedDate);
     }
-  }, [value, isOpen]);
+  }, [isOpen, selectedDate]);
 
   useEffect(() => {
     const calculatePosition = () => {
         if (!isOpen || !containerRef.current) return;
-        
         const inputRect = containerRef.current.getBoundingClientRect();
         if (!inputRect) return;
-
         const spaceBelow = window.innerHeight - inputRect.bottom;
-        const calendarHeight = 380; // Approximate height of the calendar popup in pixels
+        const calendarHeight = showTime ? 420 : 380; // Approximate height of the calendar popup in pixels
 
         if (spaceBelow < calendarHeight && inputRect.top > calendarHeight) {
             setIsPositionedAbove(true);
@@ -57,28 +60,19 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
         window.removeEventListener('resize', calculatePosition);
         document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, showTime]);
   
-  const currentYear = displayDate.getFullYear();
-  const years = useMemo(() => {
-    const yearArr = [];
-    for (let i = currentYear - 50; i <= currentYear + 10; i++) {
-        yearArr.push(i);
-    }
-    return yearArr;
-  }, [currentYear]);
+  const currentYear = currentDisplayDate.getFullYear();
+  const years = useMemo(() => Array.from({ length: 61 }, (_, i) => currentYear - 50 + i), [currentYear]);
 
-  const months = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => ({
+  const months = useMemo(() => Array.from({ length: 12 }, (_, i) => ({
         value: i,
         label: new Date(0, i).toLocaleString(i18n.language, { month: 'long' })
-    }));
-  }, [i18n.language]);
+    })), [i18n.language]);
 
   const calendarDays = useMemo(() => {
-    const date = new Date(displayDate);
-    const year = date.getFullYear();
-    const month = date.getMonth();
+    const year = currentDisplayDate.getFullYear();
+    const month = currentDisplayDate.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
@@ -92,17 +86,32 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
         days.push(null);
     }
     return days;
-  }, [displayDate]);
+  }, [currentDisplayDate]);
 
   const handleDateSelect = (day: Date) => {
-    const dateString = day.toISOString().split('T')[0];
-    onChange({ target: { value: dateString } });
+    if (showTime) {
+      const newDateTime = new Date(selectedDate);
+      newDateTime.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
+      onChange({ target: { value: newDateTime.toISOString() } });
+    } else {
+      const dateString = day.toISOString().split('T')[0];
+      onChange({ target: { value: dateString } });
+    }
     setIsOpen(false);
   };
   
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const [hours, minutes] = e.target.value.split(':');
+      if (hours && minutes) {
+          const newDateTime = new Date(selectedDate);
+          newDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+          onChange({ target: { value: newDateTime.toISOString() } });
+      }
+  };
+
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newYear = parseInt(e.target.value, 10);
-    setDisplayDate(prev => {
+    setCurrentDisplayDate(prev => {
         const newDate = new Date(prev);
         newDate.setFullYear(newYear);
         return newDate;
@@ -111,7 +120,7 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
 
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newMonth = parseInt(e.target.value, 10);
-    setDisplayDate(prev => {
+    setCurrentDisplayDate(prev => {
         const newDate = new Date(prev);
         newDate.setMonth(newMonth);
         return newDate;
@@ -119,7 +128,7 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
   };
 
   const changeMonth = (delta: number) => {
-    setDisplayDate(prev => {
+    setCurrentDisplayDate(prev => {
       const newDate = new Date(prev);
       newDate.setDate(1);
       newDate.setMonth(newDate.getMonth() + delta);
@@ -129,31 +138,24 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const selectedDate = new Date(value);
-  if (!isNaN(selectedDate.getTime())) {
-    selectedDate.setHours(0, 0, 0, 0);
-  }
+  const selectedDay = new Date(selectedDate);
+  selectedDay.setHours(0, 0, 0, 0);
   
   const popoverClasses = [
-    'absolute',
-    'z-50',
-    'bg-white dark:bg-gray-800',
-    'rounded-lg shadow-xl border border-gray-200 dark:border-gray-700',
-    'p-4',
-    'w-72', // A bit smaller to fit better on small screens
-    isPositionedAbove ? 'bottom-full mb-2' : 'mt-2'
+    'absolute', 'z-50', 'bg-white dark:bg-gray-800', 'rounded-lg shadow-xl border border-gray-200 dark:border-gray-700',
+    'p-4', 'w-72', isPositionedAbove ? 'bottom-full mb-2' : 'top-full mt-2'
   ].join(' ');
 
   return (
-    <div ref={containerRef}>
+    <div>
       {label && <label htmlFor={id} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{label}</label>}
-      <div className="relative">
+      <div className="relative" ref={containerRef}>
         <input
           id={id}
           type="text"
           readOnly
           onClick={() => setIsOpen(!isOpen)}
-          value={value}
+          value={showTime ? formatDateTime(value, i18n.language) : value.split('T')[0]}
           className="w-full pl-3 pr-10 py-2 cursor-pointer bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm transition-colors duration-200"
           {...props}
         />
@@ -164,50 +166,48 @@ const CalendarInput: React.FC<CalendarInputProps> = ({ label, id, value, onChang
         </div>
         {isOpen && (
           <div className={popoverClasses}>
+            {/* Header */}
             <div className="flex justify-between items-center mb-3">
               <button type="button" onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                 <svg className="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </button>
                <div className="flex-grow flex justify-center items-center space-x-2">
-                 <select value={displayDate.getMonth()} onChange={handleMonthChange} className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-2 py-1 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm font-semibold">
-                      {months.map(month => (
-                          <option key={month.value} value={month.value}>{month.label}</option>
-                      ))}
+                 <select value={currentDisplayDate.getMonth()} onChange={handleMonthChange} className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-2 py-1 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm font-semibold">
+                      {months.map(month => <option key={month.value} value={month.value}>{month.label}</option>)}
                   </select>
-                  <select value={displayDate.getFullYear()} onChange={handleYearChange} className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-2 py-1 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm font-semibold">
-                      {years.map(year => (
-                          <option key={year} value={year}>{year}</option>
-                      ))}
+                  <select value={currentDisplayDate.getFullYear()} onChange={handleYearChange} className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-2 py-1 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm font-semibold">
+                      {years.map(year => <option key={year} value={year}>{year}</option>)}
                   </select>
                </div>
               <button type="button" onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                 <svg className="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
+            {/* Weekdays */}
             <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 dark:text-gray-400 mb-2">
               {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(day => <div key={day}>{day}</div>)}
             </div>
+            {/* Days */}
             <div className="grid grid-cols-7 gap-1">
               {calendarDays.map((day, index) => (
                 <div key={index} className="flex justify-center items-center h-9">
                   {day && (
-                    <button
-                      type="button"
-                      onClick={() => handleDateSelect(day)}
-                      className={`w-9 h-9 flex items-center justify-center rounded-full text-sm transition-colors ${
-                        !isNaN(selectedDate.getTime()) && day.getTime() === selectedDate.getTime()
-                          ? 'bg-primary text-white font-bold'
-                          : day.getTime() === today.getTime()
-                          ? 'border-2 border-primary text-primary'
-                          : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      {day.getDate()}
-                    </button>
+                    <button type="button" onClick={() => handleDateSelect(day)} className={`w-9 h-9 flex items-center justify-center rounded-full text-sm transition-colors ${
+                        day.getTime() === selectedDay.getTime() ? 'bg-primary text-white font-bold' :
+                        day.getTime() === today.getTime() ? 'border-2 border-primary text-primary' :
+                        'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}>{day.getDate()}</button>
                   )}
                 </div>
               ))}
             </div>
+            {/* Time Input */}
+            {showTime && (
+                <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <input type="time" value={selectedDate.toTimeString().substring(0, 5)} onChange={handleTimeChange}
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm" />
+                </div>
+            )}
           </div>
         )}
       </div>
