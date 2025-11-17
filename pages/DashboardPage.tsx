@@ -99,13 +99,20 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
     }, [transactions, categories, type]);
 
     const total = useMemo(() => data.reduce((sum, item) => sum + item.value, 0), [data]);
-    const largestCategory = useMemo(() => data.length > 0 ? data.slice().sort((a,b) => b.value - a.value)[0] : null, [data]);
 
-    const [activeCategory, setActiveCategory] = useState(largestCategory);
+    const [hoveredCategory, setHoveredCategory] = useState<(typeof data[0]) | null>(null);
 
+    const largestCategory = useMemo(() => {
+        if (data.length === 0) return null;
+        return data.slice().sort((a, b) => b.value - a.value)[0];
+    }, [data]);
+    
+    const activeCategory = hoveredCategory || largestCategory;
+    
     useEffect(() => {
-        setActiveCategory(largestCategory);
-    }, [largestCategory]);
+        setHoveredCategory(null);
+    }, [data]);
+
 
     return (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
@@ -119,7 +126,7 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
             <div className="grid grid-cols-2 gap-4 items-center">
                 <div className="relative h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
-                        <PieChart onMouseLeave={() => setActiveCategory(largestCategory)}>
+                        <PieChart onMouseLeave={() => setHoveredCategory(null)}>
                             <Pie 
                                 data={data} 
                                 cx="50%" 
@@ -129,7 +136,7 @@ const CategoryDonutChart: React.FC<{ transactions: Transaction[], categories: Ca
                                 dataKey="value" 
                                 nameKey="name" 
                                 paddingAngle={0}
-                                onMouseEnter={(entry) => setActiveCategory(entry)}
+                                onMouseEnter={(entry) => setHoveredCategory(entry)}
                             >
                                 {data.map((entry) => <Cell key={`cell-${entry.name}`} fill={entry.color} stroke={theme === 'dark' ? '#1f2937' : '#ffffff'} strokeWidth={2} />)}
                             </Pie>

@@ -9,6 +9,7 @@ import Modal from '../components/Modal';
 import Input from '../components/Input';
 import BillCard from '../components/BillCard';
 import TransactionModal from '../components/TransactionModal';
+import ConfirmModal from '../components/ConfirmModal';
 
 const BillsPage: React.FC = () => {
   const { bills, addBill, updateBill, deleteBill, transactions, setActiveBillId, addTransaction, updateTransaction, categories, assets } = useAppContext();
@@ -17,6 +18,7 @@ const BillsPage: React.FC = () => {
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [txModalBillId, setTxModalBillId] = useState<string | null>(null);
   const [editingTx, setEditingTx] = useState<any>(null);
+  const [billToDelete, setBillToDelete] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -41,8 +43,13 @@ const BillsPage: React.FC = () => {
   };
   
   const handleBillDelete = (id: string) => {
-    if (window.confirm(t('bills.delete_confirm'))) {
-        deleteBill(id);
+    setBillToDelete(id);
+  }
+
+  const confirmDelete = () => {
+    if (billToDelete) {
+        deleteBill(billToDelete);
+        setBillToDelete(null);
     }
   }
 
@@ -145,6 +152,13 @@ const BillsPage: React.FC = () => {
         categories={categories}
         billId={txModalBillId}
         assets={assets}
+      />
+      <ConfirmModal
+        isOpen={!!billToDelete}
+        onClose={() => setBillToDelete(null)}
+        onConfirm={confirmDelete}
+        title={t('common.confirm_delete')}
+        message={t('bills.delete_confirm')}
       />
     </div>
   );

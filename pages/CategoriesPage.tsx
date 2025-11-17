@@ -9,6 +9,7 @@ import { ICONS, COLORS } from '../constants';
 import CategoryIcon from '../components/CategoryIcon';
 import Select from '../components/Select';
 import { useTheme } from '../hooks/useTheme';
+import ConfirmModal from '../components/ConfirmModal';
 
 const CategoriesPage: React.FC = () => {
     const { categories, addCategory, updateCategory, deleteCategory, activeBillId, bills } = useAppContext();
@@ -16,6 +17,7 @@ const CategoriesPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
     const [activeTab, setActiveTab] = useState<TransactionType>(TransactionType.EXPENSE);
+    const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
     const activeBill = React.useMemo(() => bills.find(b => b.id === activeBillId), [bills, activeBillId]);
     const canEdit = activeBill?.permission !== 'view';
@@ -48,8 +50,13 @@ const CategoriesPage: React.FC = () => {
     };
 
     const handleDelete = (id: string) => {
-        if (window.confirm(t('categories.delete_confirm'))) {
-            deleteCategory(id);
+        setCategoryToDelete(id);
+    };
+
+    const confirmDelete = () => {
+        if (categoryToDelete) {
+            deleteCategory(categoryToDelete);
+            setCategoryToDelete(null);
         }
     };
 
@@ -118,6 +125,13 @@ const CategoriesPage: React.FC = () => {
             </div>
 
             <CategoryFormModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} category={currentCategory} />
+            <ConfirmModal
+                isOpen={!!categoryToDelete}
+                onClose={() => setCategoryToDelete(null)}
+                onConfirm={confirmDelete}
+                title={t('common.confirm_delete')}
+                message={t('categories.delete_confirm')}
+            />
         </div>
     );
 };

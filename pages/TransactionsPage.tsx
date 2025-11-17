@@ -10,12 +10,14 @@ import Input from '../components/Input';
 import CategoryIcon from '../components/CategoryIcon';
 import Select from '../components/Select';
 import TransactionModal from '../components/TransactionModal';
+import ConfirmModal from '../components/ConfirmModal';
 
 const TransactionsPage: React.FC = () => {
     const { transactions, categories, activeBillId, addTransaction, updateTransaction, deleteTransaction, bills, assets } = useAppContext();
     const { t, i18n } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentTx, setCurrentTx] = useState<Transaction | null>(null);
+    const [txToDelete, setTxToDelete] = useState<string | null>(null);
 
     const [filterCategory, setFilterCategory] = useState('');
     const [filterType, setFilterType] = useState('');
@@ -58,8 +60,13 @@ const TransactionsPage: React.FC = () => {
     };
 
     const handleDelete = (id: string) => {
-        if(window.confirm(t('transactions.delete_confirm'))) {
-            deleteTransaction(id);
+        setTxToDelete(id);
+    };
+
+    const confirmDelete = () => {
+        if (txToDelete) {
+            deleteTransaction(txToDelete);
+            setTxToDelete(null);
         }
     };
     
@@ -140,6 +147,13 @@ const TransactionsPage: React.FC = () => {
                 categories={categories} 
                 billId={activeBillId} 
                 assets={assets}
+            />
+             <ConfirmModal
+                isOpen={!!txToDelete}
+                onClose={() => setTxToDelete(null)}
+                onConfirm={confirmDelete}
+                title={t('common.confirm_delete')}
+                message={t('transactions.delete_confirm')}
             />
         </div>
     );

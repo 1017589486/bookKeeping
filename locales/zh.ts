@@ -216,7 +216,8 @@ export default {
     "edit": "编辑",
     "delete": "删除",
     "remove": "移除",
-    "uncategorized": "未分类"
+    "uncategorized": "未分类",
+    "confirm_delete": "确认删除"
   },
   "transactionTypes": {
     "income": "收入",

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { Bill, Category, Transaction, User, BillShare, Asset } from '../types';
 
@@ -221,11 +220,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
   const deleteTransaction = async (id: string) => {
-    const response = await fetch(`${API_BASE_URL}/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
-    const { deletedTransactionId, updatedAsset } = await response.json();
-    setTransactions(prev => prev.filter(t => t.id !== deletedTransactionId));
-    if (updatedAsset) {
-        setAssets(prevAssets => prevAssets.map(a => a.id === updatedAsset.id ? updatedAsset : a));
+    try {
+      const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        let message = `Request failed with status ${response.status}`;
+        try {
+            const errorData = await response.json();
+            message = errorData.message || message;
+        } catch (e) {
+            // response was not JSON
+        }
+        console.error('Failed to delete transaction:', message);
+        return;
+      }
+
+      // Successful response, parse data and update state
+      const { deletedTransactionId, updatedAsset } = await response.json();
+      
+      setTransactions(prev => prev.filter(t => t.id !== deletedTransactionId));
+
+      if (updatedAsset) {
+        setAssets(prevAssets =>
+          prevAssets.map(a => (a.id === updatedAsset.id ? updatedAsset : a))
+        );
+      }
+    } catch (error) {
+      console.error('Error during transaction deletion:', error);
     }
   };
 

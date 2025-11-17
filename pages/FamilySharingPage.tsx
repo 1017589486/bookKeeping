@@ -6,11 +6,13 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import Input from '../components/Input';
 import Select from '../components/Select';
+import ConfirmModal from '../components/ConfirmModal';
 
 const FamilySharingPage: React.FC = () => {
   const { user, bills, billShares, addBillShare, updateBillShare, deleteBillShare } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentShare, setCurrentShare] = useState<BillShare | null>(null);
+  const [shareToDelete, setShareToDelete] = useState<string | null>(null);
   const { t } = useTranslation();
 
   const openModal = (share: BillShare | null = null) => {
@@ -33,8 +35,13 @@ const FamilySharingPage: React.FC = () => {
   };
   
   const handleDelete = (id: string) => {
-    if (window.confirm(t('sharing.delete_confirm'))) {
-        deleteBillShare(id);
+    setShareToDelete(id);
+  }
+
+  const confirmDelete = () => {
+    if (shareToDelete) {
+        deleteBillShare(shareToDelete);
+        setShareToDelete(null);
     }
   }
 
@@ -81,6 +88,14 @@ const FamilySharingPage: React.FC = () => {
       </div>
 
       <ShareFormModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} share={currentShare} ownedBills={ownedBills} />
+      <ConfirmModal
+        isOpen={!!shareToDelete}
+        onClose={() => setShareToDelete(null)}
+        onConfirm={confirmDelete}
+        title={t('common.confirm_delete')}
+        message={t('sharing.delete_confirm')}
+        confirmText={t('common.remove')}
+      />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import Input from '../components/Input';
 import AssetCard from '../components/AssetCard';
 import { formatCurrency } from '../utils/helpers';
 import AssetTrendChart from '../components/charts/AssetTrendChart';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AssetsPage: React.FC = () => {
     const { assets, addAsset, updateAsset, deleteAsset, transactions } = useAppContext();
@@ -19,6 +20,7 @@ const AssetsPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
     const [trendView, setTrendView] = useState<'monthly' | 'daily'>('monthly');
+    const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
 
     const openModal = (asset: Asset | null = null) => {
         setCurrentAsset(asset);
@@ -40,8 +42,13 @@ const AssetsPage: React.FC = () => {
     };
 
     const handleDelete = (id: string) => {
-        if (window.confirm(t('assets.delete_confirm'))) {
-            deleteAsset(id);
+        setAssetToDelete(id);
+    };
+
+    const confirmDelete = () => {
+        if (assetToDelete) {
+            deleteAsset(assetToDelete);
+            setAssetToDelete(null);
         }
     };
 
@@ -162,6 +169,13 @@ const AssetsPage: React.FC = () => {
             )}
             
             <AssetFormModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} asset={currentAsset} />
+            <ConfirmModal
+                isOpen={!!assetToDelete}
+                onClose={() => setAssetToDelete(null)}
+                onConfirm={confirmDelete}
+                title={t('common.confirm_delete')}
+                message={t('assets.delete_confirm')}
+            />
         </div>
     );
 };

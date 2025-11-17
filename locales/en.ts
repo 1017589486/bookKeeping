@@ -216,7 +216,8 @@ export default {
     "edit": "Edit",
     "delete": "Delete",
     "remove": "Remove",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "confirm_delete": "Confirm Delete"
   },
   "transactionTypes": {
     "income": "Income",

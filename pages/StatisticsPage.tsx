@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
@@ -144,8 +145,7 @@ const PeriodSection: React.FC<PeriodSectionProps> = ({ dateRange, prevDateRange,
     const assetDistributionData = useMemo(() => assets.map(asset => ({ name: asset.name, value: asset.balance })).sort((a,b) => b.value - a.value), [assets]);
 
     const totalAssets = useMemo(() => assetDistributionData.reduce((sum, item) => sum + item.value, 0), [assetDistributionData]);
-    const largestAsset = useMemo(() => assetDistributionData.length > 0 ? assetDistributionData[0] : null, [assetDistributionData]);
-
+    
     const assetFlowData = useMemo(() => assets.map(asset => {
         const income = filteredTransactions.filter(t => t.assetId === asset.id && t.type === TransactionType.INCOME).reduce((s, t) => s + t.amount, 0);
         const expense = filteredTransactions.filter(t => t.assetId === asset.id && t.type === TransactionType.EXPENSE).reduce((s, t) => s + t.amount, 0);
@@ -190,23 +190,8 @@ const PeriodSection: React.FC<PeriodSectionProps> = ({ dateRange, prevDateRange,
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <StatCard title={t('statistics.asset_distribution')}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center min-h-[300px]">
-                        <div className="relative h-[250px] md:h-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={assetDistributionData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={2}>
-                                        {assetDistributionData.map((_entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
-                                    </Pie>
-                                </PieChart>
-                            </ResponsiveContainer>
-                            {largestAsset && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span className="text-lg font-bold text-gray-900 dark:text-white text-center w-3/4 truncate" title={largestAsset.name}>{largestAsset.name}</span>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">{totalAssets > 0 ? ((largestAsset.value / totalAssets) * 100).toFixed(1) : '0.0'}%</span>
-                                </div>
-                            )}
-                        </div>
-                         <div className="space-y-4 self-center overflow-y-auto max-h-[280px] no-scrollbar">
+                    <div className="min-h-[300px] flex items-center">
+                         <div className="w-full space-y-4 overflow-y-auto max-h-[280px] no-scrollbar">
                             {assetDistributionData.map((asset, index) => {
                                 const percentage = totalAssets > 0 ? (asset.value / totalAssets) * 100 : 0;
                                 const color = COLORS[index % COLORS.length];
@@ -271,31 +256,12 @@ const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'
 const CategoryChart: React.FC<{ data: { name: string; value: number; color: string; icon: string; }[] }> = ({ data }) => {
     const { t, i18n } = useTranslation();
     const total = useMemo(() => data.reduce((sum, item) => sum + item.value, 0), [data]);
-    const largestCategory = useMemo(() => {
-        if (data.length === 0) return null;
-        return data.slice().sort((a, b) => b.value - a.value)[0];
-    }, [data]);
 
     if (data.length === 0) return <div className="h-[300px] flex items-center justify-center text-gray-500">{t('dashboard.no_data')}</div>;
     
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center min-h-[300px]">
-            <div className="h-[250px] md:h-full relative">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={2}>
-                            {data.map((entry) => <Cell key={`cell-${entry.name}`} fill={entry.color} />)}
-                        </Pie>
-                    </PieChart>
-                </ResponsiveContainer>
-                {largestCategory && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-lg font-bold text-gray-900 dark:text-white text-center w-3/4 truncate" title={largestCategory.name}>{largestCategory.name}</span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">{total > 0 ? ((largestCategory.value / total) * 100).toFixed(1) : '0.0'}%</span>
-                    </div>
-                )}
-            </div>
-            <div className="space-y-4 self-center overflow-y-auto max-h-[280px] no-scrollbar">
+        <div className="min-h-[300px] flex items-center">
+            <div className="w-full space-y-4 overflow-y-auto max-h-[280px] no-scrollbar">
                 {data.slice().sort((a,b) => b.value - a.value).map(item => {
                     const percentage = total > 0 ? (item.value / total * 100) : 0;
                     return (
