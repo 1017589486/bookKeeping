@@ -65,11 +65,11 @@ export default {
   },
   "transactions": {
     "add_transaction": "Add Transaction",
-    "search_notes": "Search by notes",
+    "search_notes": "Search notes...",
     "all_types": "All Types",
     "all_categories": "All Categories",
     "actions": "Actions",
-    "no_transactions": "No transactions found for the selected criteria.",
+    "no_transactions": "No transactions found.",
     "select_bill_first": "Please select a bill first.",
     "delete_confirm": "Are you sure you want to delete this transaction?",
     "edit_transaction": "Edit Transaction",
@@ -113,7 +113,7 @@ export default {
     "view_details": "View Details",
     "asset_transactions": "Asset Transactions",
     "no_transactions": "No transactions found for this asset.",
-    "balance_bill": "Balance Asset",
+    "balance_bill": "Balance Bill",
     "balance_asset_title": "Balance Asset",
     "current_balance": "Current Balance",
     "actual_balance": "Actual Balance",
@@ -217,8 +217,7 @@ export default {
     "delete": "Delete",
     "remove": "Remove",
     "uncategorized": "Uncategorized",
-    "confirm_delete": "Confirm Delete",
-    "loading": "Loading..."
+    "confirm_delete": "Confirm Delete"
   },
   "transactionTypes": {
     "income": "Income",

@@ -65,11 +65,11 @@ export default {
   },
   "transactions": {
     "add_transaction": "添加交易",
-    "search_notes": "按备注搜索",
+    "search_notes": "搜索备注...",
     "all_types": "所有类型",
     "all_categories": "所有分类",
     "actions": "操作",
-    "no_transactions": "未找到符合条件的交易记录。",
+    "no_transactions": "未找到交易记录。",
     "select_bill_first": "请先选择一个账本。",
     "delete_confirm": "您确定要删除此交易记录吗？",
     "edit_transaction": "编辑交易",
@@ -217,8 +217,7 @@ export default {
     "delete": "删除",
     "remove": "移除",
     "uncategorized": "未分类",
-    "confirm_delete": "确认删除",
-    "loading": "加载中..."
+    "confirm_delete": "确认删除"
   },
   "transactionTypes": {
     "income": "收入",
