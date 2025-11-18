@@ -1,4 +1,3 @@
-
 // Fix: Imported `useEffect` from React to resolve 'Cannot find name' error.
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -312,7 +311,7 @@ const DailyTransactionList: React.FC<{ transactions: Transaction[], categories: 
 };
 
 const DashboardPage: React.FC = () => {
-    const { user, categories, activeBillId, isLoading: isAppLoading, assets } = useAppContext();
+    const { transactions, categories, activeBillId, isLoading, assets } = useAppContext();
     const { t } = useTranslation();
     
     const [currentDate, setCurrentDate] = useState(() => {
@@ -323,8 +322,6 @@ const DashboardPage: React.FC = () => {
     });
 
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [transactionsForMonth, setTransactionsForMonth] = useState<Transaction[]>([]);
-    const [isDashboardLoading, setIsDashboardLoading] = useState(true);
 
     useEffect(() => {
         const today = new Date();
@@ -332,31 +329,16 @@ const DashboardPage: React.FC = () => {
         setCurrentDate(new Date(today.getFullYear(), today.getMonth(), 1));
     }, []);
 
-    useEffect(() => {
-        const fetchTransactionsForMonth = async () => {
-            if (!activeBillId || !user) {
-                setTransactionsForMonth([]);
-                return;
-            }
-            setIsDashboardLoading(true);
-            try {
-                const year = currentDate.getFullYear();
-                const month = currentDate.getMonth() + 1;
-                const headers = { 'X-User-ID': user.id };
-                const response = await fetch(`http://localhost:3001/api/transactions?billId=${activeBillId}&year=${year}&month=${month}`, { headers });
-                if (!response.ok) throw new Error('Failed to fetch');
-                const data = await response.json();
-                setTransactionsForMonth(data);
-            } catch (error) {
-                console.error("Failed to fetch dashboard transactions:", error);
-                setTransactionsForMonth([]);
-            } finally {
-                setIsDashboardLoading(false);
-            }
-        };
-
-        fetchTransactionsForMonth();
-    }, [activeBillId, currentDate, user]);
+    const transactionsForMonth = useMemo(() => {
+        if (!activeBillId) return [];
+        return transactions.filter(t => {
+            // FIX: Parse date parts from string to avoid timezone issues
+            const [year, month] = t.date.substring(0, 10).split('-').map(Number);
+            return t.billId === activeBillId &&
+                year === currentDate.getFullYear() &&
+                month === currentDate.getMonth() + 1;
+        });
+    }, [transactions, activeBillId, currentDate]);
 
     const { totalIncome, totalExpense, balance } = useMemo(() => {
         let income = 0;
@@ -374,7 +356,7 @@ const DashboardPage: React.FC = () => {
         return billCategories.map(c => ({...c, name: c.isSeed ? t(c.name as any) : c.name }));
     }, [categories, activeBillId, t]);
 
-    if (isAppLoading) {
+    if (isLoading) {
         return <div className="text-center text-gray-500 dark:text-gray-400">Loading financial data...</div>;
     }
 
@@ -385,32 +367,26 @@ const DashboardPage: React.FC = () => {
                 <StatCard title="收入" value={totalIncome} icon={<div className="bg-[#34C759] w-full h-full rounded-lg flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2m10 0a5 5 0 01-10 0m10 0a2 2 0 11-4 0 2 2 0 014 0zM12 15v2m-3-2v2m6-2v2M12 21a9 9 0 110-18 9 9 0 010 18z" /></svg></div>}/>
                 <StatCard title="结余" value={balance} icon={<div className="bg-[#007AFF] w-full h-full rounded-lg flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14L4 7m8 4v10M4 7v10l8 4" /></svg></div>}/>
             </div>
-            {isDashboardLoading ? (
-                <div className="flex items-center justify-center h-96">
-                    <div className="text-xl font-semibold text-gray-900 dark:text-gray-100">Loading...</div>
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div className="lg:col-span-3 space-y-6">
+                    <DailyDistributionChart transactions={transactionsForMonth} currentDate={currentDate} />
+                    <CategoryDonutChart transactions={transactionsForMonth} categories={activeBillCategories} />
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div className="lg:col-span-3 space-y-6">
-                        <DailyDistributionChart transactions={transactionsForMonth} currentDate={currentDate} />
-                        <CategoryDonutChart transactions={transactionsForMonth} categories={activeBillCategories} />
-                    </div>
-                    <div className="lg:col-span-2 space-y-6">
-                        <Calendar 
-                            currentDate={currentDate} 
-                            setCurrentDate={setCurrentDate} 
-                            selectedDate={selectedDate}
-                            setSelectedDate={setSelectedDate}
-                            transactions={transactionsForMonth} 
-                        />
-                        <DailyTransactionList 
-                            transactions={transactionsForMonth} 
-                            categories={activeBillCategories}
-                            assets={assets}
-                        />
-                    </div>
+                <div className="lg:col-span-2 space-y-6">
+                    <Calendar 
+                        currentDate={currentDate} 
+                        setCurrentDate={setCurrentDate} 
+                        selectedDate={selectedDate}
+                        setSelectedDate={setSelectedDate}
+                        transactions={transactionsForMonth} 
+                    />
+                    <DailyTransactionList 
+                        transactions={transactionsForMonth} 
+                        categories={activeBillCategories}
+                        assets={assets}
+                    />
                 </div>
-            )}
+            </div>
         </div>
     );
 };

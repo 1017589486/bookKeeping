@@ -102,31 +102,12 @@ app.get('/api/bills', userScoped, (req, res) => {
 
 app.get('/api/transactions', userScoped, async (req, res) => {
     const db = readDb();
-    const { billId, year, month } = req.query;
-
     // Logic to get all accessible bill IDs (owned and shared)
     const ownedBillIds = db.bills.filter(b => b.userId === req.userId).map(b => b.id);
     const sharedBillIds = db.billShares.filter(bs => bs.sharedWithUserId === req.userId).map(s => s.billId);
     const accessibleBillIds = [...new Set([...ownedBillIds, ...sharedBillIds])];
-    
-    let transactions = db.transactions.filter(t => accessibleBillIds.includes(t.billId));
 
-    if (billId) {
-        if (!accessibleBillIds.includes(billId)) {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-        transactions = transactions.filter(t => t.billId === billId);
-    }
-
-    if (year && month) {
-        const numYear = parseInt(year, 10);
-        const numMonth = parseInt(month, 10);
-        transactions = transactions.filter(t => {
-            const [txYear, txMonth] = t.date.substring(0, 10).split('-').map(Number);
-            return txYear === numYear && txMonth === numMonth;
-        });
-    }
-    
+    const transactions = db.transactions.filter(t => accessibleBillIds.includes(t.billId));
     res.json(transactions);
 });
 
