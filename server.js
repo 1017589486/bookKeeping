@@ -102,12 +102,39 @@ app.get('/api/bills', userScoped, (req, res) => {
 
 app.get('/api/transactions', userScoped, async (req, res) => {
     const db = readDb();
+    const { billId, categoryId, type, searchQuery, startDate, endDate } = req.query;
+
     // Logic to get all accessible bill IDs (owned and shared)
     const ownedBillIds = db.bills.filter(b => b.userId === req.userId).map(b => b.id);
     const sharedBillIds = db.billShares.filter(bs => bs.sharedWithUserId === req.userId).map(s => s.billId);
     const accessibleBillIds = [...new Set([...ownedBillIds, ...sharedBillIds])];
 
-    const transactions = db.transactions.filter(t => accessibleBillIds.includes(t.billId));
+    let transactions = db.transactions.filter(t => accessibleBillIds.includes(t.billId));
+
+    // Apply filters from query params
+    if (billId) {
+        if (!accessibleBillIds.includes(billId)) {
+            return res.status(403).json({ message: 'Forbidden: Access to this bill is not allowed.' });
+        }
+        transactions = transactions.filter(t => t.billId === billId);
+    }
+    if (categoryId) {
+        transactions = transactions.filter(t => t.categoryId === categoryId);
+    }
+    if (type) {
+        transactions = transactions.filter(t => t.type === type);
+    }
+    if (searchQuery) {
+        transactions = transactions.filter(t => t.notes.toLowerCase().includes(String(searchQuery).toLowerCase()));
+    }
+    if (startDate) {
+        // dates are in YYYY-MM-DD or ISO string format, simple string comparison works after normalization
+        transactions = transactions.filter(t => t.date.split('T')[0] >= startDate);
+    }
+    if (endDate) {
+        transactions = transactions.filter(t => t.date.split('T')[0] <= endDate);
+    }
+
     res.json(transactions);
 });
 

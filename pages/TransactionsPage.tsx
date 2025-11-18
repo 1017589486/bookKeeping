@@ -1,6 +1,6 @@
 
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../hooks/useAppContext';
 import { Transaction, TransactionType, Category } from '../types';
@@ -11,36 +11,62 @@ import CategoryIcon from '../components/CategoryIcon';
 import Select from '../components/Select';
 import TransactionModal from '../components/TransactionModal';
 import ConfirmModal from '../components/ConfirmModal';
+import CalendarInput from '../components/CalendarInput';
 
 const TransactionsPage: React.FC = () => {
-    const { transactions, categories, activeBillId, addTransaction, updateTransaction, deleteTransaction, bills, assets } = useAppContext();
+    const { user, categories, activeBillId, addTransaction, updateTransaction, deleteTransaction, bills, assets } = useAppContext();
     const { t, i18n } = useTranslation();
+
+    // Page-specific state
+    const [pageTransactions, setPageTransactions] = useState<Transaction[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentTx, setCurrentTx] = useState<Transaction | null>(null);
     const [txToDelete, setTxToDelete] = useState<string | null>(null);
 
+    // Filter states
     const [filterCategory, setFilterCategory] = useState('');
     const [filterType, setFilterType] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     const activeBill = useMemo(() => bills.find(b => b.id === activeBillId), [bills, activeBillId]);
     const canEdit = activeBill?.permission !== 'view';
+    const activeBillName = activeBill?.name || t('nav.transactions');
 
-    const activeBillTransactions = useMemo(
-        () => transactions.filter(t => t.billId === activeBillId), 
-        [transactions, activeBillId]
-    );
+    const fetchTransactions = useCallback(async () => {
+        if (!activeBillId || !user) {
+            setPageTransactions([]);
+            setIsLoading(false);
+            return;
+        }
+        setIsLoading(true);
+        const params = new URLSearchParams({ billId: activeBillId });
+        if (filterCategory) params.append('categoryId', filterCategory);
+        if (filterType) params.append('type', filterType);
+        if (searchQuery) params.append('searchQuery', searchQuery);
+        if (startDate) params.append('startDate', startDate.split('T')[0]);
+        if (endDate) params.append('endDate', endDate.split('T')[0]);
 
-    const filteredTransactions = useMemo(() => {
-        return activeBillTransactions
-            .filter(t => filterCategory ? t.categoryId === filterCategory : true)
-            .filter(t => filterType ? t.type === filterType : true)
-            .filter(t => searchQuery ? t.notes.toLowerCase().includes(searchQuery.toLowerCase()) : true)
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    }, [activeBillTransactions, filterCategory, filterType, searchQuery]);
+        try {
+            const response = await fetch(`http://localhost:3001/api/transactions?${params.toString()}`, {
+                headers: { 'X-User-ID': user.id }
+            });
+            const data = await response.json();
+            setPageTransactions(data.sort((a: Transaction, b: Transaction) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+        } catch (error) {
+            console.error("Failed to fetch transactions:", error);
+            setPageTransactions([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [activeBillId, filterCategory, filterType, searchQuery, startDate, endDate, user]);
+
+    useEffect(() => {
+        fetchTransactions();
+    }, [fetchTransactions]);
     
-    const activeBillName = activeBill?.name || 'Transactions';
-
     const openModal = (tx: Transaction | null = null) => {
         setCurrentTx(tx);
         setIsModalOpen(true);
@@ -50,23 +76,25 @@ const TransactionsPage: React.FC = () => {
         setIsModalOpen(false);
     };
 
-    const handleSave = (txData: Omit<Transaction, 'id' | 'userId'>, isNew: boolean) => {
+    const handleSave = async (txData: Omit<Transaction, 'id' | 'userId'>, isNew: boolean) => {
       if (isNew) {
-        addTransaction(txData);
+        await addTransaction(txData);
       } else if(currentTx) {
-        updateTransaction({ ...currentTx, ...txData });
+        await updateTransaction({ ...currentTx, ...txData });
       }
       closeModal();
+      fetchTransactions();
     };
 
     const handleDelete = (id: string) => {
         setTxToDelete(id);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (txToDelete) {
-            deleteTransaction(txToDelete);
+            await deleteTransaction(txToDelete);
             setTxToDelete(null);
+            fetchTransactions();
         }
     };
     
@@ -83,22 +111,26 @@ const TransactionsPage: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <Input
-                    type="search"
-                    placeholder={t('transactions.search_notes')}
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                />
-                <Select value={filterType} onChange={e => setFilterType(e.target.value)}>
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-md">
+                <div className="md:col-span-2 lg:col-span-4">
+                     <Input
+                        label={t('transactions.search_notes')}
+                        type="search"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <Select label={t('transactions.type')} value={filterType} onChange={e => setFilterType(e.target.value)}>
                     <option value="">{t('transactions.all_types')}</option>
                     <option value={TransactionType.INCOME}>{t('transactionTypes.income')}</option>
                     <option value={TransactionType.EXPENSE}>{t('transactionTypes.expense')}</option>
                 </Select>
-                <Select value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
+                <Select label={t('transactions.category')} value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
                     <option value="">{t('transactions.all_categories')}</option>
                     {categories.filter(c => c.billId === activeBillId).map(c => <option key={c.id} value={c.id}>{getCategoryName(c)}</option>)}
                 </Select>
+                <CalendarInput label={t('import_export.from')} value={startDate} onChange={e => setStartDate(e.target.value)} />
+                <CalendarInput label={t('import_export.to')} value={endDate} onChange={e => setEndDate(e.target.value)} />
             </div>
 
             {/* Transactions Table */}
@@ -114,29 +146,34 @@ const TransactionsPage: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredTransactions.map(transaction => {
-                            const category = categories.find(c => c.id === transaction.categoryId);
-                            return (
-                                <tr key={transaction.id} className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <td className="px-6 py-4 flex items-center">
-                                        {category && <CategoryIcon icon={category.icon} color={category.color} />}
-                                        <span className="ml-3 font-medium text-gray-900 dark:text-gray-100">{getCategoryName(category)}</span>
-                                    </td>
-                                    <td className="px-6 py-4">{formatDateTime(transaction.date, i18n.language)}</td>
-                                    <td className="px-6 py-4">{transaction.notes}</td>
-                                    <td className={`px-6 py-4 text-right font-semibold ${transaction.type === TransactionType.INCOME ? 'text-secondary' : 'text-danger'}`}>
-                                        {transaction.type === TransactionType.INCOME ? '+' : '-'}{formatCurrency(transaction.amount, i18n.language)}
-                                    </td>
-                                    <td className="px-6 py-4 text-center space-x-2">
-                                        <button onClick={() => openModal(transaction)} disabled={!canEdit} className="font-medium text-primary hover:text-indigo-500 disabled:text-gray-400 disabled:no-underline">{t('common.edit')}</button>
-                                        <button onClick={() => handleDelete(transaction.id)} disabled={!canEdit} className="font-medium text-danger hover:text-red-500 disabled:text-gray-400 disabled:no-underline">{t('common.delete')}</button>
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                        {isLoading ? (
+                            <tr><td colSpan={5} className="text-center py-8 text-gray-500 dark:text-gray-400">{t('common.loading')}</td></tr>
+                        ) : pageTransactions.length > 0 ? (
+                            pageTransactions.map(transaction => {
+                                const category = categories.find(c => c.id === transaction.categoryId);
+                                return (
+                                    <tr key={transaction.id} className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="px-6 py-4 flex items-center">
+                                            {category && <CategoryIcon icon={category.icon} color={category.color} />}
+                                            <span className="ml-3 font-medium text-gray-900 dark:text-gray-100">{getCategoryName(category)}</span>
+                                        </td>
+                                        <td className="px-6 py-4">{formatDateTime(transaction.date, i18n.language)}</td>
+                                        <td className="px-6 py-4">{transaction.notes}</td>
+                                        <td className={`px-6 py-4 text-right font-semibold ${transaction.type === TransactionType.INCOME ? 'text-secondary' : 'text-danger'}`}>
+                                            {transaction.type === TransactionType.INCOME ? '+' : '-'}{formatCurrency(transaction.amount, i18n.language)}
+                                        </td>
+                                        <td className="px-6 py-4 text-center space-x-2">
+                                            <button onClick={() => openModal(transaction)} disabled={!canEdit} className="font-medium text-primary hover:text-indigo-500 disabled:text-gray-400 disabled:no-underline">{t('common.edit')}</button>
+                                            <button onClick={() => handleDelete(transaction.id)} disabled={!canEdit} className="font-medium text-danger hover:text-red-500 disabled:text-gray-400 disabled:no-underline">{t('common.delete')}</button>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        ) : (
+                            <tr><td colSpan={5} className="text-center text-gray-500 dark:text-gray-400 py-8">{t('transactions.no_transactions')}</td></tr>
+                        )}
                     </tbody>
                 </table>
-                 {filteredTransactions.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('transactions.no_transactions')}</p>}
             </div>
 
             <TransactionModal 
